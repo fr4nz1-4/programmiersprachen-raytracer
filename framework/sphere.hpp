@@ -5,9 +5,12 @@
 
 class Sphere : public Shape {
 public:
+    Sphere(glm::vec3 center, float radius);
+    unsigned float area() const override;
+    float volume() const override;
 private:
     glm::vec3 center_;
-    glm::vec3 radius_;
+    float radius_;
 };
 
 #endif //RAYTRACER_SPHERE_HPP
