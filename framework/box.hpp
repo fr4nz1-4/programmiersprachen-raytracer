@@ -6,7 +6,7 @@
 class Box : public Shape {
 public:
     Box(glm::vec3 min, glm::vec3 max);
-    unsigned float area() const override;
+    float area() const override;
     float volume() const override;
 private:
     glm::vec3 min_;

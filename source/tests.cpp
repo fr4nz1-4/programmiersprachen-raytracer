@@ -29,13 +29,13 @@ TEST_CASE("box volume", "[volume]") {
 
     // berechnung mit eigentlich negativem ergebnis
     Box box3 ({3,6,1}, {1,2,3});
-    REQUIRE(box3.volume() == 40.0f);
+    REQUIRE(box3.volume() == 16.0f);
 }
 
 TEST_CASE("sphere area", "[area]") {
     // Normalfall
     Sphere sphere1({0,0,0}, 5.0f);
-    REQUIRE(sphere1.area() == Approx(314.0f));
+    REQUIRE(sphere1.area() == Approx(314.15927f));
 
     // radius 0
     Sphere sphere2({0,0,0}, 0.0f);
@@ -43,13 +43,13 @@ TEST_CASE("sphere area", "[area]") {
 
     // negativer radius
     Sphere sphere3({0,0,0}, -5.0f);
-    REQUIRE(sphere3.area() == Approx(314.0f));
+    REQUIRE(sphere3.area() == Approx(314.15927f));
 }
 
 TEST_CASE("sphere volume", "[volume]") {
     // Normalfall
     Sphere sphere1({0,0,0}, 5.0f);
-    REQUIRE(sphere1.volume() == Approx(523.0f));
+    REQUIRE(sphere1.volume() == Approx(523.59882f));
 
     // radius 0
     Sphere sphere2({0,0,0}, 0.0f);
@@ -57,7 +57,7 @@ TEST_CASE("sphere volume", "[volume]") {
 
     // negativer radius
     Sphere sphere3({0,0,0}, -5.0f);
-    REQUIRE(sphere3.volume() == Approx(523.0f));
+    REQUIRE(sphere3.volume() == Approx(523.59882f));
 }
 
 int main(int argc, char *argv[])

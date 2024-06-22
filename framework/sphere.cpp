@@ -5,10 +5,10 @@ Sphere::Sphere(glm::vec3 center, float radius) :
     center_{center},
     radius_{radius} {}
 
-unsigned float Sphere::area() const {
+float Sphere::area() const {
     return 4 * M_PI * pow(radius_, 2);
 }
 
 float Sphere::volume() const {
-    return (4/3) * pow(radius_, 3) * M_PI;
+    return (4.0f/3.0f) * abs(pow(radius_, 3)) * M_PI;
 }
