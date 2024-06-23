@@ -1,10 +1,15 @@
 #include "box.hpp"
 
-Box::Box(glm::vec3 min, glm::vec3 max) :
+Box::Box(const std::string &name, const Color &color, glm::vec3 min, glm::vec3 max) :
+    Shape(name, color),
     min_{min},
     max_{max} {}
 
- float Box::area() const {
+//Box::Box(glm::vec3 min, glm::vec3 max) :
+//    min_{min},
+//    max_{max} {}
+
+float Box::area() const {
     float a = abs(max_.x - min_.x);
     float b = abs(max_.y - min_.y);
     float c = abs(max_.z - min_.z);

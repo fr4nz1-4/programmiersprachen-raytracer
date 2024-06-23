@@ -1,9 +1,11 @@
 #include "sphere.hpp"
+#include "tuple"
 #include "cmath"
 
-Sphere::Sphere(glm::vec3 center, float radius) :
-    center_{center},
-    radius_{radius} {}
+Sphere::Sphere(const std::string &name, const Color &color, glm::vec3 center, float radius) :
+        Shape(name, color),
+        center_{center},
+        radius_{radius} {}
 
 float Sphere::area() const {
     return 4 * M_PI * pow(radius_, 2);
