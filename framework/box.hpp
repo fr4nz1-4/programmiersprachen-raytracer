@@ -8,7 +8,7 @@ class Box : public Shape {
 public:
     float area() const override;
     float volume() const override;
-//    Box(glm::vec3 min_, glm::vec3 max_);
+    Box(glm::vec3 min_, glm::vec3 max_);
     Box(const std::string &name, const Color &color, glm::vec3 min, glm::vec3 max);
 private:
     std::string name_;

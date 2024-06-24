@@ -14,3 +14,9 @@ float Sphere::area() const {
 float Sphere::volume() const {
     return (4.0f/3.0f) * abs(pow(radius_, 3)) * M_PI;
 }
+
+Sphere::Sphere(glm::vec3 center, float radius) :
+Shape("grau", {1.0f, 1.0f, 1.0f}),
+center_{center},
+radius_{radius}
+{}

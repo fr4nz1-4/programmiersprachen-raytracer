@@ -6,29 +6,29 @@
 
 TEST_CASE("box area", "[area]") {
     // Normalfall
-    Box box1 ({1,1,1}, {3,3,3});
+    Box box1({1, 1, 1}, {3, 3, 3});
     REQUIRE(box1.area() == 24.0f);
 
     // ein punkt 0
-    Box box2 ({0,0,0}, {1,2,3});
+    Box box2({0, 0, 0}, {1, 2, 3});
     REQUIRE(box2.area() == 22.0f);
 
     // berechnung mit eigentlich negativem ergebnis
-    Box box3 ({3,6,1}, {1,2,3});
+    Box box3({3, 6, 1}, {1, 2, 3});
     REQUIRE(box3.area() == 40.0f);
 }
 
 TEST_CASE("box volume", "[volume]") {
     // Normalfall
-    Box box1 ({1,1,1}, {3,3,3});
+    Box box1{{1, 1, 1}, {3, 3, 3}};
     REQUIRE(box1.volume() == 8.0f);
 
     // eine seite ist 0
-    Box box2 ({1,2,3}, {0,0,3});
+    Box box2({1, 2, 3}, {0, 0, 3});
     REQUIRE(box2.volume() == 0.0f);
 
     // berechnung mit eigentlich negativem ergebnis
-    Box box3 ({3,6,1}, {1,2,3});
+    Box box3({3, 6, 1}, {1, 2, 3});
     REQUIRE(box3.volume() == 16.0f);
 }
 
