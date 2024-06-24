@@ -3,6 +3,7 @@
 #include "box.hpp"
 #include "sphere.hpp"
 #include "shape.hpp"
+#include "iostream"
 
 TEST_CASE("box area", "[area]") {
     // Normalfall
@@ -58,6 +59,13 @@ TEST_CASE("sphere volume", "[volume]") {
     // negativer radius
     Sphere sphere3({0,0,0}, -5.0f);
     REQUIRE(sphere3.volume() == Approx(523.59882f));
+}
+
+TEST_CASE("test print") {
+    Sphere sphere1({0,0,0}, 5.0f);
+    Box box1({1, 1, 1}, {3, 3, 3});
+    std::cout<< sphere1;
+    std::cout<< box1;
 }
 
 int main(int argc, char *argv[])
