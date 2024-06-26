@@ -7,8 +7,7 @@ Shape::Shape(std::string const& name, Color const& color) :
 {}
 
 std::ostream& Shape::print(std::ostream &os) const {
-    std::string st = "name: " + name_ + " | Farbe: " + std::to_string(color_.r) + ", " + std::to_string(color_.g) + ", " + std::to_string(color_.b);
-    return os << st;
+    return os << "name: " + name_ + " | Farbe: " + std::to_string(color_.r) + ", " + std::to_string(color_.g) + ", " + std::to_string(color_.b);
 }
 
 std::ostream& operator<<(std::ostream& os, Shape const& shape) {
