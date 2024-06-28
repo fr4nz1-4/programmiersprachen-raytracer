@@ -10,6 +10,7 @@ public:
     virtual std::ostream& print(std::ostream& os) const;
     virtual float area() const = 0;
     virtual float volume() const = 0;
+    virtual ~Shape();
 private:
     std::string name_;
     Color color_;

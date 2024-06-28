@@ -15,6 +15,7 @@ public:
     HitPoint intersect (Ray const& ray) const;
     float area() const override;
     float volume() const override;
+    ~Sphere();
 
 private:
     std::string name_;

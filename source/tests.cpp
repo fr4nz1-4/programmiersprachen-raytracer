@@ -139,7 +139,7 @@ TEST_CASE("5.7: statischer typ, dynamischer typ") {
     s2->print(std::cout);
 }
 
-TEST_CASE("test_destructor") {
+TEST_CASE("konstruktor destruktor Reihenfolge") {
     Color red{255, 0, 0};
     glm::vec3 position{0.0f, 0.0f, 0.0f};
     Sphere *s1 = new Sphere{"sphere0", red, position, 1.2f};

@@ -3,7 +3,9 @@
 Box::Box(std::string const& name, Color const& color, glm::vec3 min, glm::vec3 max) :
     Shape(name, color),
     min_{min},
-    max_{max} {}
+    max_{max} {
+    std::cout<< "Box constructor\n";
+}
 
 //Box::Box(glm::vec3 min, glm::vec3 max) :
 //    min_{min},
@@ -32,4 +34,8 @@ max_{max} {}
 
 std::ostream &Box::print(std::ostream &os) const {
     return Shape::print(os) << " | Minimum-Punkt: " << min_.x << ", " << min_.y << ", " << min_.z << " | Maximum-Punkt: " << max_.x << ", " << max_.y << ", " << max_.z << "\n";
+}
+
+Box::~Box() {
+    std::cout<< "Box destructor\n";
 }

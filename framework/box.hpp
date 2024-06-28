@@ -11,6 +11,8 @@ public:
     std::ostream& print(std::ostream& os) const override;
     Box(glm::vec3 min_, glm::vec3 max_);
     Box(const std::string &name, const Color &color, glm::vec3 min, glm::vec3 max);
+    ~Box();
+
 private:
     std::string name_;
     Color color_;
