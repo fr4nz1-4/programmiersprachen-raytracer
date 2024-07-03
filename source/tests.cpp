@@ -7,63 +7,65 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/intersect.hpp>
 
-TEST_CASE("box area", "[area]") {
-    // Normalfall
-    Box box1({1, 1, 1}, {3, 3, 3});
-    REQUIRE(box1.area() == 24.0f);
+TEST_CASE("area_tests", "[area]") {
+    SECTION("box area") {
+        // Normalfall
+        Box box1({1, 1, 1}, {3, 3, 3});
+        REQUIRE(box1.area() == 24.0f);
 
-    // ein punkt 0
-    Box box2({0, 0, 0}, {1, 2, 3});
-    REQUIRE(box2.area() == 22.0f);
+        // ein punkt 0
+        Box box2({0, 0, 0}, {1, 2, 3});
+        REQUIRE(box2.area() == 22.0f);
 
-    // berechnung mit eigentlich negativem ergebnis
-    Box box3({3, 6, 1}, {1, 2, 3});
-    REQUIRE(box3.area() == 40.0f);
+        // berechnung mit eigentlich negativem ergebnis
+        Box box3({3, 6, 1}, {1, 2, 3});
+        REQUIRE(box3.area() == 40.0f);
+    }
+    SECTION("sphere area") {
+        // Normalfall
+        Sphere sphere1({0,0,0}, 5.0f);
+        REQUIRE(sphere1.area() == Approx(314.15927f));
+
+        // radius 0
+        Sphere sphere2({0,0,0}, 0.0f);
+        REQUIRE(sphere2.area() == 0.0f);
+
+        // negativer radius
+        Sphere sphere3({0,0,0}, -5.0f);
+        REQUIRE(sphere3.area() == Approx(314.15927f));
+    }
 }
 
-TEST_CASE("box volume", "[volume]") {
-    // Normalfall
-    Box box1{{1, 1, 1}, {3, 3, 3}};
-    REQUIRE(box1.volume() == 8.0f);
+TEST_CASE("volume_tests", "[volume]") {
+    SECTION("box volume") {
+        // Normalfall
+        Box box1{{1, 1, 1}, {3, 3, 3}};
+        REQUIRE(box1.volume() == 8.0f);
 
-    // eine seite ist 0
-    Box box2({1, 2, 3}, {0, 0, 3});
-    REQUIRE(box2.volume() == 0.0f);
+        // eine seite ist 0
+        Box box2({1, 2, 3}, {0, 0, 3});
+        REQUIRE(box2.volume() == 0.0f);
 
-    // berechnung mit eigentlich negativem ergebnis
-    Box box3({3, 6, 1}, {1, 2, 3});
-    REQUIRE(box3.volume() == 16.0f);
+        // berechnung mit eigentlich negativem ergebnis
+        Box box3({3, 6, 1}, {1, 2, 3});
+        REQUIRE(box3.volume() == 16.0f);
+    }
+    SECTION("Sphere volume") {
+        // Normalfall
+        Sphere sphere1({0,0,0}, 5.0f);
+        REQUIRE(sphere1.volume() == Approx(523.59882f));
+
+        // radius 0
+        Sphere sphere2({0,0,0}, 0.0f);
+        REQUIRE(sphere2.volume() == 0.0f);
+
+        // negativer radius
+        Sphere sphere3({0,0,0}, -5.0f);
+        REQUIRE(sphere3.volume() == Approx(523.59882f));
+    }
 }
 
-TEST_CASE("sphere area", "[area]") {
-    // Normalfall
-    Sphere sphere1({0,0,0}, 5.0f);
-    REQUIRE(sphere1.area() == Approx(314.15927f));
-
-    // radius 0
-    Sphere sphere2({0,0,0}, 0.0f);
-    REQUIRE(sphere2.area() == 0.0f);
-
-    // negativer radius
-    Sphere sphere3({0,0,0}, -5.0f);
-    REQUIRE(sphere3.area() == Approx(314.15927f));
-}
-
-TEST_CASE("sphere volume", "[volume]") {
-    // Normalfall
-    Sphere sphere1({0,0,0}, 5.0f);
-    REQUIRE(sphere1.volume() == Approx(523.59882f));
-
-    // radius 0
-    Sphere sphere2({0,0,0}, 0.0f);
-    REQUIRE(sphere2.volume() == 0.0f);
-
-    // negativer radius
-    Sphere sphere3({0,0,0}, -5.0f);
-    REQUIRE(sphere3.volume() == Approx(523.59882f));
-}
-
-TEST_CASE("test print") {
+TEST_CASE("print_test") {
     Sphere sphere1({0,0,0}, 5.0f);
     Box box1({1, 1, 1}, {3, 3, 3});
     std::cout<< sphere1;
@@ -88,6 +90,7 @@ TEST_CASE("intersect_ray_sphere", "[intersect]") {
                 sphere_radius * sphere_radius, // squared radius !!!
                 distance);
         REQUIRE(distance == Approx(4.0f));
+        REQUIRE(result == true);
     }
 
     SECTION("ray schneidet kugel nicht") {
@@ -146,7 +149,7 @@ TEST_CASE("konstruktor destruktor Reihenfolge") {
     Shape *s2 = new Sphere{"sphere1", red, position, 1.2f};
     s1->print(std::cout);
     s2->print(std::cout);
-    delete s1;
+    delete s1; // if destructor isn't virtual: s1 is objekt of class shape
     delete s2;
 }
 

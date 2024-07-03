@@ -27,7 +27,7 @@ float Box::volume() const {
     return a * b * c;
 }
 
-Box::Box(glm::vec3 min, glm::vec3 max) :
+Box::Box(glm::vec3 const& min, glm::vec3 const& max) :
 Shape{"grau", {1.0f, 1.0f, 1.0f}},
 min_{min},
 max_{max} {}

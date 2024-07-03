@@ -18,8 +18,8 @@ public:
     ~Sphere();
 
 private:
-    std::string name_;
-    Color color_;
+//    std::string name_;
+//    Color color_;
     glm::vec3 center_;
     float radius_;
 };
