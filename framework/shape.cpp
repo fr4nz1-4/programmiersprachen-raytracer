@@ -1,14 +1,14 @@
 #include "shape.hpp"
 #include "iostream"
 
-Shape::Shape(std::string const& name, Color const& color) :
+Shape::Shape(std::string const& name, std::shared_ptr<Material> const& material) :
     name_{name},
-    color_{color} {
+    material_{material} {
     std::cout<< "Shape constructor\n";
 }
 
 std::ostream& Shape::print(std::ostream &os) const {
-    return os << "name: " + name_ + " | Farbe: " + std::to_string(color_.r) + ", " + std::to_string(color_.g) + ", " + std::to_string(color_.b);
+    return os << "name: " + name_ + " | Material: " << material_;
 }
 
 Shape::~Shape() {
