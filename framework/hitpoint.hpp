@@ -7,9 +7,9 @@
 #include "material.hpp"
 
 struct HitPoint {
-    bool intersection;
+    bool intersection = false;
     float distance = 0.0f;
-    std::string name;
+    std::string name = "no name";
     std::shared_ptr<Material> material;
     glm::vec3 intersection_point = {0.0f, 0.0f, 0.0f}; // glm::vec3(std::numeric_limits<float>::infinity);
     glm::vec3 direction = {0.0f, 0.0f, 0.0f};

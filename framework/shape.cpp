@@ -4,7 +4,7 @@
 Shape::Shape(std::string const& name, std::shared_ptr<Material> const& material) :
     name_{name},
     material_{material} {
-    std::cout<< "Shape constructor\n";
+//    std::cout<< "Shape constructor\n";
 }
 
 std::ostream& Shape::print(std::ostream &os) const {
@@ -12,7 +12,7 @@ std::ostream& Shape::print(std::ostream &os) const {
 }
 
 Shape::~Shape() {
-    std::cout<< "Shape destructor\n";
+//    std::cout<< "Shape destructor\n";
 }
 
 std::ostream& operator<<(std::ostream& os, Shape const& shape) {
