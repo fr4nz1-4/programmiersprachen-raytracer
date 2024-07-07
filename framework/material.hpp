@@ -4,7 +4,7 @@
 #include "color.hpp"
 
 struct Material {
-    std::string name_ = {"nameless"};
+    std::string name_ = "nameless";
     Color ka = {0, 0, 0};
     Color kd = {0, 0, 0};
     Color ks = {0, 0, 0};

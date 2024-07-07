@@ -6,6 +6,7 @@
 #include "iostream"
 #include <glm/glm.hpp>
 #include <glm/gtx/intersect.hpp>
+#include "scene.hpp"
 
 //Material blue = {"blue", {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, 20.0f};
 //Material green = {"green", {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, 20.0f};
@@ -162,63 +163,6 @@ TEST_CASE("konstruktor destruktor Reihenfolge") {
 */
 
 TEST_CASE("intersect_ray_box", "[intersect]") {
-    /*
-    Box r1{ "red1", red, glm::vec3 {-1.0f,-1.0f,6.0f}, glm::vec3 {1.0f,1.0f,7.0f}};
-    Box y1{ "yellow1", red, glm::vec3 {0.0f,4.0f,0.0f}, glm::vec3 {1.0f,5.0f,1.0f}};
-    Box g1{ "green1", red, glm::vec3 {4.0f,-1.0f,0.0f}, glm::vec3 {5.0f,1.0f,1.0f}};
-
-    Ray x{ glm::vec3{0,0,0} , glm::vec3{1,0,0} };
-    Ray y{ glm::vec3{0,0,0} , glm::vec3{0,1,0} };
-    Ray z{ glm::vec3{0,0,0} , glm::vec3{0,0,1} };
-    Ray mz{ glm::vec3{0,0,0} , glm::vec3{0,0,-1} };
-
-    HitPoint r1_mz = r1.intersect(mz);
-    HitPoint r1_x = r1.intersect(x);
-    HitPoint r1_y = r1.intersect(y);
-    HitPoint r1_z = r1.intersect(z);
-    std::cout << "\n";
-
-    HitPoint y1_x = y1.intersect(x);
-    HitPoint y1_y = y1.intersect(y);
-    HitPoint y1_z = y1.intersect(z);
-    HitPoint y1_mz = y1.intersect(mz);
-    std::cout << "\n";
-
-    HitPoint g1_x = g1.intersect(x);
-    HitPoint g1_y = g1.intersect(y);
-    HitPoint g1_z = g1.intersect(z);
-    HitPoint g1_mz = g1.intersect(mz);
-    std::cout << "\n";
-
-    REQUIRE(r1_x.intersection == false);
-    REQUIRE(r1_y.intersection == false);
-    REQUIRE(r1_mz.intersection == false);
-    REQUIRE(y1_x.intersection == false);
-    REQUIRE(y1_z.intersection == false);
-    REQUIRE(y1_mz.intersection == false);
-    REQUIRE(g1_z.intersection == false);
-    REQUIRE(g1_y.intersection == false);
-    REQUIRE(g1_mz.intersection == false);
-
-    REQUIRE(r1_z.intersection == true);
-    REQUIRE(r1_z.distance == 6.0f);
-    REQUIRE(r1_z.direction == glm::vec3{ 0,0,1 });
-    REQUIRE(r1_z.name == std::string{ "red1" });
-    REQUIRE(r1_z.intersection_point == glm::vec3{ 0,0,6 });
-
-    REQUIRE(y1_y.intersection == true);
-    REQUIRE(y1_y.distance == 4.0f);
-    REQUIRE(y1_y.direction == glm::vec3{ 0,1,0 });
-    REQUIRE(y1_y.name == std::string{ "yellow1" });
-    REQUIRE(y1_y.intersection_point == glm::vec3{ 0,4,0 });
-
-    REQUIRE(g1_x.intersection == true);
-    REQUIRE(g1_x.distance == 4.0f);
-    REQUIRE(g1_x.direction == glm::vec3{ 1,0,0 });
-    REQUIRE(g1_x.name == std::string{ "green1" });
-    REQUIRE(g1_x.intersection_point == glm::vec3{ 4,0,0 });
-*/
-
     Box b1{"box1", red, {2,0,0}, {4,1,1}}; // rand-/kantenfall
     Box b2{"box2", red, {-1,4,-1}, {3,8,3}};
     Box b3{"box3", red, {-2,-1,6}, {1,2,9}};
@@ -279,6 +223,57 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
         REQUIRE(b3_ray_y.intersection == false);
         REQUIRE(b3_ray_nx.intersection == false);
     }
+}
+
+TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
+// leere scene erstellen um sie zu übergeben
+    Scene scene;
+
+    parse_sdf_file("/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/scene_1.sdf", scene);
+
+    REQUIRE(scene.material_container.size() == 3);
+
+// Test für material red
+    auto red_material= scene.material_container[0];
+    REQUIRE(red_material->name_ == "red");
+    REQUIRE(red_material->ka.r == 1.0f);
+    REQUIRE(red_material->ka.g == 0.0f);
+    REQUIRE(red_material->ka.b == 0.0f);
+    REQUIRE(red_material->kd.r == 1.0f);
+    REQUIRE(red_material->kd.g == 0.0f);
+    REQUIRE(red_material->kd.b == 0.0f);
+    REQUIRE(red_material->ks.r == 1.0f);
+    REQUIRE(red_material->ks.g == 0.0f);
+    REQUIRE(red_material->ks.b == 0.0f);
+    REQUIRE(red_material->m == 20);
+
+// Test für material green
+    auto green_material= scene.material_container[1];
+    REQUIRE(green_material->name_ == "green");
+    REQUIRE(green_material->ka.r == 0.0f);
+    REQUIRE(green_material->ka.g == 1.0f);
+    REQUIRE(green_material->ka.b == 0.0f);
+    REQUIRE(green_material->kd.r == 0.0f);
+    REQUIRE(green_material->kd.g == 1.0f);
+    REQUIRE(green_material->kd.b == 0.0f);
+    REQUIRE(green_material->ks.r == 0.0f);
+    REQUIRE(green_material->ks.g == 1.0f);
+    REQUIRE(green_material->ks.b == 0.0f);
+    REQUIRE(green_material->m == 50);
+
+// Test für material blue
+    auto blue_material = scene.material_container[2];
+    REQUIRE(blue_material->name_ == "blue");
+    REQUIRE(blue_material->ka.r == 0.0f);
+    REQUIRE(blue_material->ka.g == 0.0f);
+    REQUIRE(blue_material->ka.b == 1.0f);
+    REQUIRE(blue_material->kd.r == 0.0f);
+    REQUIRE(blue_material->kd.g == 0.0f);
+    REQUIRE(blue_material->kd.b == 1.0f);
+    REQUIRE(blue_material->ks.r == 0.0f);
+    REQUIRE(blue_material->ks.g == 0.0f);
+    REQUIRE(blue_material->ks.b == 1.0f);
+    REQUIRE(blue_material->m == 10);
 }
 int main(int argc, char *argv[])
 {
