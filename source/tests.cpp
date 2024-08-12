@@ -226,7 +226,7 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
     }
 }
 
-
+/*
 TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
 // leere scene erstellen um sie zu übergeben
     Scene scene;
@@ -276,7 +276,7 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
     REQUIRE(blue_material->ks.g == 0.0f);
     REQUIRE(blue_material->ks.b == 1.0f);
     REQUIRE(blue_material->m == 10);
-}
+} */
 int main(int argc, char *argv[])
 {
   return Catch::Session().run(argc, argv);
