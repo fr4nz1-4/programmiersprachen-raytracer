@@ -184,6 +184,7 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
         REQUIRE(b1_ray_x.distance == 2.0f);
         REQUIRE(b1_ray_x.intersection_point == glm::vec3{2,0,0});
         REQUIRE(b1_ray_x.name == "box1");
+        std::cout<<b1;
 
         REQUIRE(b1_ray_y.intersection == false);
         REQUIRE(b1_ray_z.intersection == false);
@@ -224,6 +225,7 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
         REQUIRE(b3_ray_nx.intersection == false);
     }
 }
+
 
 TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
 // leere scene erstellen um sie zu übergeben
