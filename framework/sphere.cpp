@@ -1,7 +1,8 @@
 #include "sphere.hpp"
 #include "tuple"
-#include "cmath"
+#include <cmath>
 #include <glm/gtx/intersect.hpp>
+
 
 Sphere::Sphere(const std::string &name, const std::shared_ptr<Material> &material, glm::vec3 const& center, float radius) :
     Shape(name, material),
@@ -11,11 +12,11 @@ Sphere::Sphere(const std::string &name, const std::shared_ptr<Material> &materia
 }
 
 float Sphere::area() const {
-    return 4.0f * M_PI * radius_ * radius_;
+    return 4.0f * std::atan(1.0f) * radius_ * radius_;
 }
 
 float Sphere::volume() const {
-    return (4.0f/3.0f) * fabs(radius_ * radius_ * radius_) * M_PI;
+    return (4.0f/3.0f) * fabs(radius_ * radius_ * radius_) * std::atan(1.0f);
 }
 
 std::ostream &Sphere::print(std::ostream &os) const {
