@@ -138,6 +138,9 @@ TEST_CASE("intersect_ray_sphere", "[intersect]") {
                 distance);
         REQUIRE(result == true);
         REQUIRE(distance == 2.0f);
+
+        Box box = {"test", red, {1.0f,3.0f,5.0f}, {5.0f,4.0f,3.0f}};
+        Sphere sphere = {"test", red, {4,3,2}, 3.4f};
     }
 }
 
@@ -160,7 +163,7 @@ TEST_CASE("konstruktor destruktor Reihenfolge") {
     delete s1; // if destructor isn't virtual: s1 is objekt of class shape
     delete s2;
 }
-*/
+//*/
 
 TEST_CASE("intersect_ray_box", "[intersect]") {
     Box b1{"box1", red, {2,0,0}, {4,1,1}}; // rand-/kantenfall
@@ -231,7 +234,7 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
 // leere scene erstellen um sie zu übergeben
     Scene scene;
 
-    parse_sdf_file("../programmiersprachen-raytracer/scene_1.sdf", scene);
+    parse_sdf_file("/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/scene_1.sdf", scene);
 
     REQUIRE(scene.material_container.size() == 3);
 
@@ -276,7 +279,9 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
     REQUIRE(blue_material->ks.g == 0.0f);
     REQUIRE(blue_material->ks.b == 1.0f);
     REQUIRE(blue_material->m == 10);
-} */
+}
+*/
+
 int main(int argc, char *argv[])
 {
   return Catch::Session().run(argc, argv);
