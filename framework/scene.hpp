@@ -11,7 +11,8 @@
 // streaming them into our Material Variables
 #include <sstream>
 #include <vector>
-#include "material.hpp"
+#include "material.hpp" 
+
 
 struct Scene {
     std::vector<std::shared_ptr<Material> > material_container;
