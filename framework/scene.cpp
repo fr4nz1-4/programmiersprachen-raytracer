@@ -51,6 +51,71 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
 
                 // push material into scene
                 scene.material_container.push_back(parsed_material);
+            }
+
+            if ("shape" == token) {
+                if ("box" == token) {
+                    // TODO: hübsch machen für adrian
+                    std::string name;
+                    Material material;
+                    auto material_ptr = std::make_shared<Material>(material);
+                    glm::vec3 min;
+                    glm::vec3 max;
+
+                    line_as_stream >> name;
+                    line_as_stream >> material.name_;
+                    line_as_stream >> material.ka.r;
+                    line_as_stream >> material.ka.g;
+                    line_as_stream >> material.ka.b;
+                    line_as_stream >> material.kd.r;
+                    line_as_stream >> material.kd.g;
+                    line_as_stream >> material.kd.b;
+                    line_as_stream >> material.ks.r;
+                    line_as_stream >> material.ks.g;
+                    line_as_stream >> material.ks.b;
+                    line_as_stream >> material.m;
+                    line_as_stream >> min.x;
+                    line_as_stream >> min.y;
+                    line_as_stream >> min.z;
+                    line_as_stream >> max.x;
+                    line_as_stream >> max.y;
+                    line_as_stream >> max.z;
+
+                    std::shared_ptr<Box> parsed_box = std::make_shared<Box>(name, material_ptr, min, max);
+                    // push box into scene
+                    scene.shape_container.push_back(parsed_box);
+                }
+
+                if ("sphere" == token) {
+                    // TODO: hübsch machen für adrian
+                    std::string name;
+                    Material material;
+                    auto material_ptr = std::make_shared<Material>(material);
+                    glm::vec3 center;
+                    float radius;
+
+                    line_as_stream >> name;
+                    line_as_stream >> material.name_;
+                    line_as_stream >> material.ka.r;
+                    line_as_stream >> material.ka.g;
+                    line_as_stream >> material.ka.b;
+                    line_as_stream >> material.kd.r;
+                    line_as_stream >> material.kd.g;
+                    line_as_stream >> material.kd.b;
+                    line_as_stream >> material.ks.r;
+                    line_as_stream >> material.ks.g;
+                    line_as_stream >> material.ks.b;
+                    line_as_stream >> material.m;
+                    line_as_stream >> center.x;
+                    line_as_stream >> center.y;
+                    line_as_stream >> center.z;
+                    line_as_stream >> radius;
+
+                    std::shared_ptr<Sphere> parsed_sphere = std::make_shared<Sphere>(name, material_ptr, center, radius);
+                    // push box into scene
+                    scene.shape_container.push_back(parsed_sphere);
+                }
+
             } else {
                 std::cerr << "Unexpected keyword: " << token << std::endl;
             }

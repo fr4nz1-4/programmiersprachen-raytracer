@@ -11,12 +11,16 @@
 // streaming them into our Material Variables
 #include <sstream>
 #include <vector>
-#include "material.hpp" 
+#include "material.hpp"
+#include "box.hpp"
+#include "sphere.hpp"
 
 
 struct Scene {
     std::vector<std::shared_ptr<Material> > material_container;
+    std::vector<std::shared_ptr<Shape> > shape_container;
 };
+
 
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene);
 
