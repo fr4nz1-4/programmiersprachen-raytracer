@@ -12,8 +12,10 @@ int main(int argc, char* argv[])
   unsigned const image_width = 800;
   unsigned const image_height = 600;
   std::string const filename = "./checkerboard.ppm";
-
+  //Scene scene1;
+  //parse_sdf_file(filename, scene1);
   Renderer renderer{image_width, image_height, filename};
+  //auto sphere2 = scene1.shape_container[0];
 
   renderer.render();
 

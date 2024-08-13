@@ -3,6 +3,10 @@
 #include <cmath>
 #include <glm/gtx/intersect.hpp>
 
+Sphere::Sphere(const glm::vec3 &center, float radius):
+    Shape{"", std::make_shared<Material>(Material{})},
+    center_{center},
+    radius_{radius} {}
 
 Sphere::Sphere(const std::string &name, const std::shared_ptr<Material> &material, glm::vec3 const& center, float radius) :
     Shape(name, material),
@@ -42,3 +46,4 @@ HitPoint Sphere::intersect(Ray const& ray) const {
 Sphere::~Sphere() {
 //    std::cout<< "Sphere destructor\n";
 }
+

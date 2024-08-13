@@ -1,5 +1,4 @@
 define material red 1 0 0 1 0 0 1 0 0 20
 define material green 0 1 0 0 1 0 0 1 0 50
 define material blue 0 0 1 0 0 1 0 0 1 10
-define shape box box1 red 3.0 1.0 1.0 2.0 2.0 2.0
 define shape sphere sphere1 blue 2.0 5.0 2.0 10.0

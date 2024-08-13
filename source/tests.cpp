@@ -10,8 +10,8 @@
 
 //Material blue = {"blue", {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, 20.0f};
 //Material green = {"green", {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, 20.0f};
-Material rot = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
-std::shared_ptr<Material> red = std::make_shared<Material>(rot);
+Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
+std::shared_ptr<Material> red = std::make_shared<Material>(red);
 
 /*
 TEST_CASE("area_tests", "[area]") {
@@ -234,7 +234,9 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
 // leere scene erstellen um sie zu übergeben
     Scene scene;
 
-    parse_sdf_file("/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/scene_1.sdf", scene);
+//    parse_sdf_file("/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/scene_2.sdf", scene);
+//    parse_sdf_file("./scene_2.sdf", scene);
+    parse_sdf_file("../scene_2.sdf", scene);
 
     REQUIRE(scene.material_container.size() == 3);
     REQUIRE(scene.shape_container.size() == 2);
