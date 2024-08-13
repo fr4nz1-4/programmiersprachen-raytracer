@@ -22,8 +22,8 @@ Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
 std::shared_ptr<Material> red_ptr = std::make_shared<Material>(red);
 
 void Renderer::render(){
-    Sphere sphere1 = {"wow", red_ptr, {20.0f, 20.0f, 20.0f}, 20.0f};  // Eine Kugel weit in die Szene setzen
-    glm::vec3 camera_origin = {0.0f, 0.0f, -100.0f};  // Setze die Kamera weit vor die Szene
+    Sphere sphere1 = {"wow", red_ptr, {width_/2, height_/2, width_/2}, 300.0f};  // Eine Kugel weit in die Szene setzen
+    glm::vec3 camera_origin = {width_/2, height_/2, -100.0f};  // Setze die Kamera weit vor die Szene
 
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {

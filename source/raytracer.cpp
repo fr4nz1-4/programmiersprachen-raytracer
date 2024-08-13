@@ -9,7 +9,7 @@
 //now single threaded again
 int main(int argc, char* argv[])
 {
-  unsigned const image_width = 800;
+  unsigned const image_width = 600;
   unsigned const image_height = 600;
   std::string const filename = "./checkerboard.ppm";
   //Scene scene1;
