@@ -18,7 +18,6 @@ public:
 private:
     glm::vec3 min_;
     glm::vec3 max_;
-
 };
 
 #endif //RAYTRACER_BOX_HPP

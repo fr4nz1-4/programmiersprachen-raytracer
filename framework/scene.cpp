@@ -1,5 +1,18 @@
 #include "scene.hpp"
 
+std::shared_ptr<Material> find_material(Scene const& scene, std::string const& material_name) {
+    // material in material_container finden
+    std::shared_ptr<Material> material = nullptr;
+    // Schleife die über alle Materiale im material_container iteriert
+    for (auto const& mat : scene.material_container) {
+        // wenn mat mit material_name übereinstimmt, ist das das gesucht material
+        if (mat->name_ == material_name) {
+            material = mat;
+            return material;
+        }
+    }
+}
+
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
     // Datei öffnen
     std::ifstream sdf_file(sdf_file_path);
@@ -51,29 +64,19 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
 
                 // push material into scene
                 scene.material_container.push_back(parsed_material);
-            }
 
-            if ("shape" == token) {
-                if ("box" == token) {
-                    // TODO: hübsch machen für adrian
+            } else if ("shape" == token) {
+                std::string shape_type;
+                line_as_stream >> shape_type;
+
+                if ("box" == shape_type) {
                     std::string name;
-                    Material material;
-                    auto material_ptr = std::make_shared<Material>(material);
+                    std::string material_name;
                     glm::vec3 min;
                     glm::vec3 max;
 
                     line_as_stream >> name;
-                    line_as_stream >> material.name_;
-                    line_as_stream >> material.ka.r;
-                    line_as_stream >> material.ka.g;
-                    line_as_stream >> material.ka.b;
-                    line_as_stream >> material.kd.r;
-                    line_as_stream >> material.kd.g;
-                    line_as_stream >> material.kd.b;
-                    line_as_stream >> material.ks.r;
-                    line_as_stream >> material.ks.g;
-                    line_as_stream >> material.ks.b;
-                    line_as_stream >> material.m;
+                    line_as_stream >> material_name;
                     line_as_stream >> min.x;
                     line_as_stream >> min.y;
                     line_as_stream >> min.z;
@@ -81,41 +84,38 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                     line_as_stream >> max.y;
                     line_as_stream >> max.z;
 
-                    std::shared_ptr<Box> parsed_box = std::make_shared<Box>(name, material_ptr, min, max);
-                    // push box into scene
-                    scene.shape_container.push_back(parsed_box);
-                }
+                    // material in material_container finden
+                    std::shared_ptr<Material> material = find_material(scene, material_name);
 
-                if ("sphere" == token) {
-                    // TODO: hübsch machen für adrian
+                    if (material != nullptr) {
+                        auto parsed_box = std::make_shared<Box>(name, material, min, max);
+                        scene.shape_container.push_back(parsed_box);
+                    } else {
+                        std::cerr << "Material not found: " << material_name << std::endl;
+                    }
+                } else if ("sphere" == shape_type) {
                     std::string name;
-                    Material material;
-                    auto material_ptr = std::make_shared<Material>(material);
+                    std::string material_name;
                     glm::vec3 center;
                     float radius;
 
                     line_as_stream >> name;
-                    line_as_stream >> material.name_;
-                    line_as_stream >> material.ka.r;
-                    line_as_stream >> material.ka.g;
-                    line_as_stream >> material.ka.b;
-                    line_as_stream >> material.kd.r;
-                    line_as_stream >> material.kd.g;
-                    line_as_stream >> material.kd.b;
-                    line_as_stream >> material.ks.r;
-                    line_as_stream >> material.ks.g;
-                    line_as_stream >> material.ks.b;
-                    line_as_stream >> material.m;
+                    line_as_stream >> material_name;
                     line_as_stream >> center.x;
                     line_as_stream >> center.y;
                     line_as_stream >> center.z;
                     line_as_stream >> radius;
 
-                    std::shared_ptr<Sphere> parsed_sphere = std::make_shared<Sphere>(name, material_ptr, center, radius);
-                    // push box into scene
-                    scene.shape_container.push_back(parsed_sphere);
-                }
+                    // material in material_container finden
+                    std::shared_ptr<Material> material = find_material(scene, material_name);
 
+                    if (material != nullptr) {
+                        auto parsed_sphere = std::make_shared<Sphere>(name, material, center, radius);
+                        scene.shape_container.push_back(parsed_sphere);
+                    } else {
+                        std::cerr << "Material not found: " << material_name << std::endl;
+                    }
+                }
             } else {
                 std::cerr << "Unexpected keyword: " << token << std::endl;
             }

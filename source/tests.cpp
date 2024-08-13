@@ -229,7 +229,7 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
     }
 }
 
-/*
+
 TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
 // leere scene erstellen um sie zu übergeben
     Scene scene;
@@ -237,6 +237,7 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
     parse_sdf_file("/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/scene_1.sdf", scene);
 
     REQUIRE(scene.material_container.size() == 3);
+    REQUIRE(scene.shape_container.size() == 2);
 
 // Test für material red
     auto red_material= scene.material_container[0];
@@ -279,8 +280,56 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
     REQUIRE(blue_material->ks.g == 0.0f);
     REQUIRE(blue_material->ks.b == 1.0f);
     REQUIRE(blue_material->m == 10);
+
+// test box
+//    auto box1  = scene.shape_container[0];
+    auto box1 = std::dynamic_pointer_cast<Box>(scene.shape_container[0]);
+    REQUIRE(scene.shape_container.empty() == false);
+    // box wird korrekt eingelesen wenn alle variablen der klassen public
+    /*
+    REQUIRE(box1->name_ == "box1");
+    REQUIRE(box1->material_->name_ == "red");
+    REQUIRE(box1->material_->ka.r == 1.0f);
+    REQUIRE(box1->material_->ka.g == 0.0f);
+    REQUIRE(box1->material_->ka.b == 0.0f);
+    REQUIRE(box1->material_->kd.r == 1.0f);
+    REQUIRE(box1->material_->kd.g == 0.0f);
+    REQUIRE(box1->material_->kd.b == 0.0f);
+    REQUIRE(box1->material_->ks.r == 1.0f);
+    REQUIRE(box1->material_->ks.g == 0.0f);
+    REQUIRE(box1->material_->ks.b == 0.0f);
+    REQUIRE(box1->material_->m == 20.0f);
+    REQUIRE(box1->min_.x == 3.0f);
+    REQUIRE(box1->min_.y == 1.0f);
+    REQUIRE(box1->min_.z == 1.0f);
+    REQUIRE(box1->max_.x == 2.0f);
+    REQUIRE(box1->max_.y == 2.0f);
+    REQUIRE(box1->max_.z == 2.0f);
+    */
+
+    // test sphere
+    auto sphere1 = std::dynamic_pointer_cast<Sphere>(scene.shape_container[1]);
+    REQUIRE(scene.shape_container.empty() == false);
+    // sphere wird korrekt eingelesen wenn alle variablen der klassen public
+    /*
+    REQUIRE(sphere1->name_ == "sphere1");
+    REQUIRE(sphere1->material_->name_ == "blue");
+    REQUIRE(sphere1->material_->ka.r == 0.0f);
+    REQUIRE(sphere1->material_->ka.g == 0.0f);
+    REQUIRE(sphere1->material_->ka.b == 1.0f);
+    REQUIRE(sphere1->material_->kd.r == 0.0f);
+    REQUIRE(sphere1->material_->kd.g == 0.0f);
+    REQUIRE(sphere1->material_->kd.b == 1.0f);
+    REQUIRE(sphere1->material_->ks.r == 0.0f);
+    REQUIRE(sphere1->material_->ks.g == 0.0f);
+    REQUIRE(sphere1->material_->ks.b == 1.0f);
+    REQUIRE(sphere1->material_->m == 10.0f);
+    REQUIRE(sphere1->center_.x == 2.0f);
+    REQUIRE(sphere1->center_.y == 5.0f);
+    REQUIRE(sphere1->center_.z == 2.0f);
+    REQUIRE(sphere1->radius_ == 10.0f);
+    */
 }
-*/
 
 int main(int argc, char *argv[])
 {
