@@ -15,6 +15,7 @@ public:
     virtual std::ostream& print(std::ostream& os) const;
     virtual HitPoint intersect(Ray const& ray) const = 0;
     virtual ~Shape();
+    std::shared_ptr<Material> get_Material() const;
 //    friend class Scene;
 
 protected:

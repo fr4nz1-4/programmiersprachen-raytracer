@@ -3,6 +3,7 @@
 
 #include <GLFW/glfw3.h>
 #include <thread>
+#include "iostream"
 #include <utility>
 #include <cmath>
 
@@ -11,11 +12,13 @@ int main(int argc, char* argv[])
 {
   unsigned const image_width = 600;
   unsigned const image_height = 600;
-  std::string const filename = "./checkerboard.ppm";
-  //Scene scene1;
-  //parse_sdf_file(filename, scene1);
-  Renderer renderer{image_width, image_height, filename};
-  //auto sphere2 = scene1.shape_container[0];
+//  std::string const filename = argv[1];
+  std::string const filename = "/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/source/scene_2.sdf";
+//  std::string const filename = "scene_2.sdf";
+
+  Scene scene1;
+  parse_sdf_file(filename, scene1);
+  Renderer renderer{image_width, image_height, filename, scene1};
 
   renderer.render();
 

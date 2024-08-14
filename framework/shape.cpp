@@ -18,3 +18,7 @@ Shape::~Shape() {
 std::ostream& operator<<(std::ostream& os, Shape const& shape) {
     return shape.print(os);
 }
+
+std::shared_ptr<Material> Shape::get_Material() const {
+    return this->material_;
+}

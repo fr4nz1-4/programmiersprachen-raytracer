@@ -123,7 +123,7 @@ HitPoint Box::intersect(const Ray &ray) const {
     hitpoint.material = material_;
     hitpoint.direction = direction;
 
-    std::cout<< hitpoint.distance << " | " << hitpoint.intersection_point.x << ", " << hitpoint.intersection_point.y << ", " << hitpoint.intersection_point.z << "\n";
+//    std::cout<< hitpoint.distance << " | " << hitpoint.intersection_point.x << ", " << hitpoint.intersection_point.y << ", " << hitpoint.intersection_point.z << "\n";
 
     return hitpoint;
 }
