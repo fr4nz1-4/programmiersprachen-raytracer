@@ -47,3 +47,6 @@ Sphere::~Sphere() {
 //    std::cout<< "Sphere destructor\n";
 }
 
+glm::vec3 Sphere::get_center() const {
+return center_;
+}

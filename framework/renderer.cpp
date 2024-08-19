@@ -20,28 +20,28 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-Color background_color = {1.0f, 1.0f, 1.0f};
+//Color background_color = {1.0f, 1.0f, 1.0f};
+Color background_color = {0.0f, 0.0f, 0.0f};
 Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
-std::shared_ptr<Material> red_ptr = std::make_shared<Material>(red);
+//std::shared_ptr<Material> red_ptr = std::make_shared<Material>(red);
 
 
 //void trace();
 
 void Renderer::render() {
-    //ambiente bumse
-    //i_a = intensität ambiente licht i=intensität der beleuchtung
-    //k_a = ambienter reflexionskoefizient
-    //
-    glm::vec3 camera_origin = {width_/2, height_/2, -100.0f};  // Setze die Kamera weit vor die Szene
+
+    glm::vec3 camera_origin = {width_/2, height_/2, -1000.0f};  // Setze die Kamera weit vor die Szene
+//    glm::vec3 camera_origin = {-100.0f, 200.0f, -1000.0f};  // Setze die Kamera weit vor die Szene
+    glm::vec3 light_position = camera_origin;
+    Color light_intensity = {0.5f, 0.5f, 0.5f}; // Beispielintensität für das Licht
 
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p = {x, y};
 
-            // Ray from camera through the pixel
+            // Ray from camera through pixel
             glm::vec3 pixel_position = {x, y, 0.0f}; // Position auf Bildfläche
-            glm::vec3 ray_direction = glm::normalize(
-                    pixel_position - camera_origin); // stellt Vektor aus zwei Punkten auf
+            glm::vec3 ray_direction = glm::normalize(pixel_position - camera_origin); // stellt Vektor aus zwei Punkten auf
 
             Ray ray = {camera_origin, ray_direction}; // Erstellt den Strahl
 
@@ -51,6 +51,8 @@ void Renderer::render() {
 
             // Überprüfe alle Objekte in der Szene
             for (auto const& shape : scene_.shape_container) {
+//                Sphere sphere = *std::dynamic_pointer_cast<Sphere>(shape);
+                auto test = std::dynamic_pointer_cast<Sphere>(shape);
                 auto hit = shape->intersect(ray);
                 if (hit.intersection) {
                     // Berechne die Distanz zur Kamera
@@ -59,11 +61,19 @@ void Renderer::render() {
                     // Falls diese Intersektion näher ist als die vorherige, aktualisiere die Farbe
                     if (distance < closest_distance) {
                         closest_distance = distance;
-                        p.color = shape->get_Material()->kd * ; // Verwende die Farbe des Materials
+
+                        // Ambienter Beleuchtungsanteil
+                        Color ambient_component = {light_intensity.r * shape->get_Material()->ka.r, light_intensity.g * shape->get_Material()->ka.g, light_intensity.b * shape->get_Material()->ka.b};
+                        glm::vec3 l = glm::normalize(light_position - hit.intersection_point); // Lichtvektor
+
+                        Sphere sphere = *std::dynamic_pointer_cast<Sphere>(shape);
+                        float diffuse_factor = std::max(glm::dot(glm::normalize(hit.intersection_point - sphere.get_center()), l), 0.0f); // Skalarprodukt von Normalenvektor und Lichtvektor
+                        Color tmp = {light_intensity.r * shape->get_Material()->kd.r, light_intensity.g * shape->get_Material()->kd.g, light_intensity.b * shape->get_Material()->kd.b};
+                        Color diffuse_component = {tmp.r * diffuse_factor, tmp.g * diffuse_factor, tmp.b * diffuse_factor};
+                        p.color = ambient_component + diffuse_component;
                     }
                 }
             }
-
             write(p);  // Schreibe die Farbe des Pixels in das Bild
         }
     }
