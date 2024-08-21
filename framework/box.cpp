@@ -128,10 +128,10 @@ HitPoint Box::intersect(const Ray &ray) const {
     return hitpoint;
 }
 
-glm::vec3 Box::normal(glm::vec3 point) const {
+glm::vec3 Box::normal(glm::vec3 const& point) {
     // Die Box hat 6 Flächen: 2x x=const, 2x y=const, 2x z=const
 
-    // Bestimme den Abstand von der Intersectionsstelle zu den Box-Flächen
+    // abstand von intersectionpoint zu Box-Flächen
     float epsilon = 1e-6f; // Kleinster Wert, um numerische Fehler zu vermeiden
 
     if (std::abs(point.x - min_.x) < epsilon) {
@@ -153,7 +153,7 @@ glm::vec3 Box::normal(glm::vec3 point) const {
         // Rückfläche der Box
         return glm::vec3(0.0f, 0.0f, 1.0f);
     } else {
-        // Falls Punkt außerhalb der Box ist, was nicht passieren sollte
+        // Ausnahmefall: Punkt außerhalb der Box
         return glm::vec3(0.0f, 0.0f, 0.0f);
     }
 }

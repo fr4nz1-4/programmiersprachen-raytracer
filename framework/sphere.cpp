@@ -50,3 +50,7 @@ Sphere::~Sphere() {
 glm::vec3 Sphere::get_center() const {
 return center_;
 }
+
+glm::vec3 Sphere::normal(glm::vec3 const& point) {
+    return glm::normalize(point - center_);
+}
