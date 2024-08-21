@@ -46,8 +46,6 @@ void Renderer::render() {
 
             // Überprüfe alle Objekte in der Szene
             for (auto const& shape : scene_.shape_container) {
-//                Sphere sphere = *std::dynamic_pointer_cast<Sphere>(shape);
-                auto test = std::dynamic_pointer_cast<Sphere>(shape);
                 auto hit = shape->intersect(ray);
                 if (hit.intersection) {
                     // Berechne distanz zur Kamera
@@ -78,22 +76,6 @@ void Renderer::render() {
 
 //    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
 }
-    // TODO: zu langsam, muss optimiert werden
-//    for (unsigned y = 0; y < height_; ++y) {
-//        for (unsigned x = 0; x < width_; ++x) {
-//            Pixel p = {x, y};
-//            auto it = std::find_if(pixel_vector.begin(), pixel_vector.end(),
-//                                   [&p](const Pixel& other){return p.x == other.x && p.y == other.y;});
-//            if (it != pixel_vector.end()) {
-//                p.color = it->color;
-//                write(p);
-//            } else {
-//                p.color = {background_color};
-//                write(p);
-//            }
-//        }
-//    }
-//}
 
 void Renderer::write(Pixel const& p)
 {
