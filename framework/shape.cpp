@@ -22,3 +22,7 @@ std::ostream& operator<<(std::ostream& os, Shape const& shape) {
 std::shared_ptr<Material> Shape::get_Material() const {
     return this->material_;
 }
+
+std::string Shape::get_name() const {
+    return this->name_;
+}

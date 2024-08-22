@@ -17,6 +17,7 @@ public:
     virtual glm::vec3 normal(glm::vec3 const& point) = 0;
     virtual ~Shape();
     std::shared_ptr<Material> get_Material() const;
+    std::string get_name() const;
 //    friend class Scene;
 
 protected:

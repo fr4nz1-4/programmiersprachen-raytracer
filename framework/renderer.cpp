@@ -27,11 +27,11 @@ void Renderer::render() {
 
     Camera camera;
     Light light = {{800.0f, 800.0f, -110.0f}, {0.5f, 0.5f, 0.5f}};
-    Light light2 = {{200.0f, 800.0f, -110.0f}, {0.5f, 0.5f, 0.5f}};
+    Light light2 = {{00.0f, -400.0f, -150.0f}, {0.5f, 0.5f, 0.5f}};
 //    Light light2 = {{camera.origin}, {0.5f, 0.5f, 0.5f}};
 
     std::vector<Light> light_container;
-    light_container.push_back(light);
+//    light_container.push_back(light);
     light_container.push_back(light2);
 
 //    glm::vec3 light_position = camera.origin;
@@ -40,10 +40,14 @@ void Renderer::render() {
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p = {x, y};
+            float xray = (2.0f * p.x) / width_ - 1.0f;
+            float yray = 1.0f - (2.0f * p.y) / height_;
+            float zray = -1.0f;
 
             // Ray from camera through pixel
             glm::vec3 pixel_position = {x, y, 0.0f}; // Position auf Bildfläche
-            glm::vec3 ray_direction = glm::normalize(pixel_position - camera.origin); // Strahlrichtung
+            glm::vec3 ray_direction = glm::normalize(glm::vec3{xray, yray, zray}-camera.origin);
+                    //glm::normalize(pixel_position - camera.origin); // Strahlrichtung
 
             Ray ray = {camera.origin, ray_direction}; // Erstelle den Strahl
 
@@ -109,6 +113,7 @@ void Renderer::render() {
                                             tmp_light.intensity.g * shape->get_Material()->ks.g * specular_factor,
                                             tmp_light.intensity.b * shape->get_Material()->ks.b * specular_factor};
                                     specular_component = specular_component + specular_component_tmp;
+                                    std::cout<< shape->get_name() <<std::endl;
                                 }
                             }
                         }
