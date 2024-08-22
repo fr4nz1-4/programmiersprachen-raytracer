@@ -116,6 +116,18 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                         std::cerr << "Material not found: " << material_name << std::endl;
                     }
                 }
+            } else if ("light" == token) {
+                std::shared_ptr<Light> parsed_light = std::make_shared<Light>();
+
+                line_as_stream >> parsed_light->name;
+                line_as_stream >> parsed_light->position.x;
+                line_as_stream >> parsed_light->position.y;
+                line_as_stream >> parsed_light->position.z;
+                line_as_stream >> parsed_light->intensity.r;
+                line_as_stream >> parsed_light->intensity.g;
+                line_as_stream >> parsed_light->intensity.b;
+
+                scene.light_container.push_back(parsed_light);
             } else {
                 std::cerr << "Unexpected keyword: " << token << std::endl;
             }

@@ -26,16 +26,16 @@ Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
 void Renderer::render() {
 
     Camera camera;
-    Light light = {{800.0f, 800.0f, -110.0f}, {0.5f, 0.5f, 0.5f}};
-    Light light2 = {{00.0f, -400.0f, -150.0f}, {0.5f, 0.5f, 0.5f}};
+//    Light light = {{0.0f, -300.0f, -150.0f}, {1.0f, 1.0f, 1.0f}};
+////    Light light2 = {{00.0f, -400.0f, -150.0f}, {0.5f, 0.5f, 0.5f}};
 //    Light light2 = {{camera.origin}, {0.5f, 0.5f, 0.5f}};
-
-    std::vector<Light> light_container;
+//
+//    std::vector<Light> light_container;
 //    light_container.push_back(light);
-    light_container.push_back(light2);
+//    light_container.push_back(light2);
 
 //    glm::vec3 light_position = camera.origin;
-    Color light_intensity_ambient = {0.3f,0.3f,0.3f};// Lichtintensität
+    Color light_intensity_ambient = {0.5f,0.5f,0.5f};// Lichtintensität
 
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
@@ -75,12 +75,10 @@ void Renderer::render() {
                         Color diffuse_component = {0,0,0};
                         Color specular_component = {0,0,0};
 
-                        for (Light tmp_light : light_container) {
-
                             bool in_shadow = false;
 
-                            for (Light const &tmp_light: light_container) {
-                                glm::vec3 light_dir = glm::normalize(tmp_light.position - hit.intersection_point);
+                            for (auto const& tmp_light: scene_.light_container) {
+                                glm::vec3 light_dir = glm::normalize(tmp_light->position - hit.intersection_point);
                                 glm::vec3 test2 = {hit.intersection_point.x + shape->normal(hit.intersection_point).x,
                                                    hit.intersection_point.y + shape->normal(hit.intersection_point).y,
                                                    hit.intersection_point.z + shape->normal(hit.intersection_point).z};
@@ -101,24 +99,25 @@ void Renderer::render() {
                                     glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
                                     float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
                                     Color diffuse_component_tmp = {
-                                            tmp_light.intensity.r * shape->get_Material()->kd.r * diffuse_factor,
-                                            tmp_light.intensity.g * shape->get_Material()->kd.g * diffuse_factor,
-                                            tmp_light.intensity.b * shape->get_Material()->kd.b * diffuse_factor};
+                                            tmp_light->intensity.r * shape->get_Material()->kd.r * diffuse_factor,
+                                            tmp_light->intensity.g * shape->get_Material()->kd.g * diffuse_factor,
+                                            tmp_light->intensity.b * shape->get_Material()->kd.b * diffuse_factor};
                                     diffuse_component = diffuse_component + diffuse_component_tmp;
 
                                     float spec_exp = shape->get_Material()->m;
                                     float specular_factor = pow(std::max(glm::dot(r, v), 0.0f), spec_exp);
                                     Color specular_component_tmp = {
-                                            tmp_light.intensity.r * shape->get_Material()->ks.r * specular_factor,
-                                            tmp_light.intensity.g * shape->get_Material()->ks.g * specular_factor,
-                                            tmp_light.intensity.b * shape->get_Material()->ks.b * specular_factor};
+                                            tmp_light->intensity.r * shape->get_Material()->ks.r * specular_factor,
+                                            tmp_light->intensity.g * shape->get_Material()->ks.g * specular_factor,
+                                            tmp_light->intensity.b * shape->get_Material()->ks.b * specular_factor};
                                     specular_component = specular_component + specular_component_tmp;
                                     std::cout<< shape->get_name() <<std::endl;
                                 }
-                            }
+
                         }
                         // Setze die endgültige Farbe des Pixels
-                        p.color = ambient_component + diffuse_component + specular_component;
+                        auto cldr = ambient_component + diffuse_component + specular_component;
+                        p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};
                     }
                 }
             }

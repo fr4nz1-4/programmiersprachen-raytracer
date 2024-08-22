@@ -4,6 +4,7 @@
 #include "color.hpp"
 
 struct Light {
+    std::string name = " ";
     glm::vec3 position = {0.0f, 0.0f, 0.0f};
     Color intensity = {1.0f, 1.0f, 1.0f};
 };
