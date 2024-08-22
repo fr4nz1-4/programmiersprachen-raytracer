@@ -16,6 +16,7 @@
 #include "scene.hpp"
 #include "ppmwriter.hpp"
 #include "camera.hpp"
+#include "light.hpp"
 #include <string>
 #include <glm/glm.hpp>
 #include <vector>

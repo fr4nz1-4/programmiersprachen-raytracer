@@ -1,5 +1,7 @@
 define material red 1 0 0 1 0 0 1 0 0 20
 define material green 0 1 0 0 1 0 0 0.2 0 5
 define material blue 0 0 1 0 0 1 0 0 1 10
-define shape sphere sphere1 green 100.0 100.0 100.0 100.0
-define shape box box1 red 300.0 300.0 100.0 400.0 400.0 400.0
+define material gray 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 10
+define shape sphere sphere1 blue 300.0 100.0 100.0 100.0
+define shape box box1 red 50.0 50.0 200.0 700.0 700.0 300.0
+define shape box floor green -100.0 0.0 0.0 700.0 00.0 400.0
