@@ -15,12 +15,13 @@
 #include "box.hpp"
 #include "sphere.hpp"
 #include "light.hpp"
-
+#include "camera.hpp"
 
 struct Scene {
     std::vector<std::shared_ptr<Material> > material_container;
     std::vector<std::shared_ptr<Shape> > shape_container;
     std::vector<std::shared_ptr<Light> > light_container;
+    std::vector<std::shared_ptr<Camera> > camera_container;
 };
 
 

@@ -25,7 +25,6 @@ Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
 
 void Renderer::render() {
 
-    Camera camera;
 //    Light light = {{0.0f, -300.0f, -150.0f}, {1.0f, 1.0f, 1.0f}};
 ////    Light light2 = {{00.0f, -400.0f, -150.0f}, {0.5f, 0.5f, 0.5f}};
 //    Light light2 = {{camera.origin}, {0.5f, 0.5f, 0.5f}};
@@ -35,7 +34,7 @@ void Renderer::render() {
 //    light_container.push_back(light2);
 
 //    glm::vec3 light_position = camera.origin;
-    Color light_intensity_ambient = {0.5f,0.5f,0.5f};// Lichtintensität
+    Color ambient_factor = {0.5f, 0.5f, 0.5f}; // Lichtintensität
 
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
@@ -46,10 +45,10 @@ void Renderer::render() {
 
             // Ray from camera through pixel
             glm::vec3 pixel_position = {x, y, 0.0f}; // Position auf Bildfläche
-            glm::vec3 ray_direction = glm::normalize(glm::vec3{xray, yray, zray}-camera.origin);
-                    //glm::normalize(pixel_position - camera.origin); // Strahlrichtung
+            glm::vec3 ray_direction = glm::normalize(glm::vec3{xray, yray, zray} - scene_.camera_container[0]->origin);
+            //glm::normalize(pixel_position - camera.origin); // Strahlrichtung
 
-            Ray ray = {camera.origin, ray_direction}; // Erstelle den Strahl
+            Ray ray = {scene_.camera_container[0]->origin, ray_direction}; // Erstelle den Strahl
 
             p.color = background_color; // Initialisiere mit Hintergrundfarbe
             float closest_distance = std::numeric_limits<float>::max(); // Um den nächsten Schnittpunkt zu finden
@@ -58,65 +57,66 @@ void Renderer::render() {
             for (auto const& shape : scene_.shape_container) {
                 auto hit = shape->intersect(ray);
                 if (hit.intersection) {
-
-                    float distance = glm::length(hit.intersection_point - camera.origin);
+                    float distance = glm::length(hit.intersection_point - scene_.camera_container[0]->origin);
+                    glm::vec3 normal = shape->normal(hit.intersection_point); // Normalenvektor
 
                     // Falls diese Intersektion näher ist als die vorherige, aktualisiere die Farbe
                     if (distance < closest_distance) {
                         closest_distance = distance;
 
-                        glm::vec3 normal = shape->normal(hit.intersection_point); // Normalenvektor
-                        glm::vec3 v = glm::normalize(camera.origin - hit.intersection_point);
+                        // Ambiente Beleuchtung (Ia * ka)
+                        Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
+                                                   ambient_factor.g * shape->get_Material()->ka.g,
+                                                   ambient_factor.b * shape->get_Material()->ka.b};
 
-                        // Ambienter Beleuchtungsanteil (Ia * ka)
-                        Color ambient_component = {light_intensity_ambient.r * shape->get_Material()->ka.r,
-                                                   light_intensity_ambient.g * shape->get_Material()->ka.g,
-                                                   light_intensity_ambient.b * shape->get_Material()->ka.b};
                         Color diffuse_component = {0,0,0};
                         Color specular_component = {0,0,0};
+                        bool in_shadow = false; // Lichtquelle ist von kamera aus sichtbar (nicht im schatten)
 
-                            bool in_shadow = false;
+                        for (auto const& tmp_light: scene_.light_container) {
+                            glm::vec3 light_dir = glm::normalize(tmp_light->position - hit.intersection_point);
+                            // TODO: test2 umbenennen
+                            glm::vec3 test2 = {hit.intersection_point.x + shape->normal(hit.intersection_point).x,
+                                               hit.intersection_point.y + shape->normal(hit.intersection_point).y,
+                                               hit.intersection_point.z + shape->normal(hit.intersection_point).z};
+                            Ray shadow_ray = {test2, light_dir};
 
-                            for (auto const& tmp_light: scene_.light_container) {
-                                glm::vec3 light_dir = glm::normalize(tmp_light->position - hit.intersection_point);
-                                glm::vec3 test2 = {hit.intersection_point.x + shape->normal(hit.intersection_point).x,
-                                                   hit.intersection_point.y + shape->normal(hit.intersection_point).y,
-                                                   hit.intersection_point.z + shape->normal(hit.intersection_point).z};
-                                Ray shadow_ray = {test2, light_dir};
-
-                                for (auto const &shape_other: scene_.shape_container) {
-                                    if (shape != shape_other) { // Teste nicht gegen sich selbst
-                                        auto shadow_hit = shape_other->intersect(shadow_ray);
-                                        if (shadow_hit.intersection) {
-                                            in_shadow = true;
-                                            break;
-                                        }
+                            for (auto const& shape_other: scene_.shape_container) {
+                                if (shape != shape_other) { // Teste nicht gegen sich selbst
+                                    auto shadow_hit = shape_other->intersect(shadow_ray);
+                                    if (shadow_hit.intersection) {
+                                        in_shadow = true;
+                                        break;
                                     }
                                 }
+                            }
 
-                                if (!in_shadow) {
-                                    // Diffuse und Spekulare Berechnung, wie im aktuellen Code
-                                    glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
-                                    float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
-                                    Color diffuse_component_tmp = {
-                                            tmp_light->intensity.r * shape->get_Material()->kd.r * diffuse_factor,
-                                            tmp_light->intensity.g * shape->get_Material()->kd.g * diffuse_factor,
-                                            tmp_light->intensity.b * shape->get_Material()->kd.b * diffuse_factor};
-                                    diffuse_component = diffuse_component + diffuse_component_tmp;
+                            if (!in_shadow) {
+                                // Diffuse Beleuchtung
+                                float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
+                                Color diffuse_component_tmp = {
+                                        tmp_light->color.r * tmp_light->brightness * shape->get_Material()->kd.r * diffuse_factor,
+                                        tmp_light->color.g * tmp_light->brightness * shape->get_Material()->kd.g * diffuse_factor,
+                                        tmp_light->color.b * tmp_light->brightness * shape->get_Material()->kd.b * diffuse_factor};
+                                diffuse_component = diffuse_component + diffuse_component_tmp;
 
-                                    float spec_exp = shape->get_Material()->m;
-                                    float specular_factor = pow(std::max(glm::dot(r, v), 0.0f), spec_exp);
-                                    Color specular_component_tmp = {
-                                            tmp_light->intensity.r * shape->get_Material()->ks.r * specular_factor,
-                                            tmp_light->intensity.g * shape->get_Material()->ks.g * specular_factor,
-                                            tmp_light->intensity.b * shape->get_Material()->ks.b * specular_factor};
-                                    specular_component = specular_component + specular_component_tmp;
-                                    std::cout<< shape->get_name() <<std::endl;
-                                }
+                                // Spekulare Beleuchtung
+                                glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
+                                glm::vec3 v = glm::normalize(scene_.camera_container[0]->origin - hit.intersection_point);
 
+                                float specular_factor = std::pow(std::max(glm::dot(r, v), 0.0f), shape->get_Material()->m);
+
+                                Color specular_component_tmp = {                                      // wenn einkommentiert hat reflektion die farbe der shape
+                                        tmp_light->color.r * tmp_light->brightness * specular_factor, //* shape->get_Material()->ks.r
+                                        tmp_light->color.g * tmp_light->brightness * specular_factor, //* shape->get_Material()->ks.g
+                                        tmp_light->color.b * tmp_light->brightness * specular_factor //* shape->get_Material()->ks.b
+                                        };
+                                specular_component = (specular_component + specular_component_tmp);
+                                std::cout<< shape->get_name() <<std::endl; // test fürs debugging
+                            }
                         }
                         // Setze die endgültige Farbe des Pixels
-                        auto cldr = ambient_component + diffuse_component + specular_component;
+                        Color cldr = ambient_component + diffuse_component + specular_component;
                         p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};
                     }
                 }

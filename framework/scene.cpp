@@ -123,11 +123,28 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                 line_as_stream >> parsed_light->position.x;
                 line_as_stream >> parsed_light->position.y;
                 line_as_stream >> parsed_light->position.z;
-                line_as_stream >> parsed_light->intensity.r;
-                line_as_stream >> parsed_light->intensity.g;
-                line_as_stream >> parsed_light->intensity.b;
+                line_as_stream >> parsed_light->color.r;
+                line_as_stream >> parsed_light->color.g;
+                line_as_stream >> parsed_light->color.b;
+                line_as_stream >> parsed_light->brightness;
 
                 scene.light_container.push_back(parsed_light);
+            } else if ("camera" == token) {
+                std::shared_ptr<Camera> parsed_camera = std::make_shared<Camera>();
+
+                line_as_stream >> parsed_camera->name;
+                line_as_stream >> parsed_camera->fov;
+                line_as_stream >> parsed_camera->origin.x;
+                line_as_stream >> parsed_camera->origin.y;
+                line_as_stream >> parsed_camera->origin.z;
+                line_as_stream >> parsed_camera->direction.x;
+                line_as_stream >> parsed_camera->direction.y;
+                line_as_stream >> parsed_camera->direction.z;
+                line_as_stream >> parsed_camera->up.x;
+                line_as_stream >> parsed_camera->up.y;
+                line_as_stream >> parsed_camera->up.z;
+
+                scene.camera_container.push_back(parsed_camera);
             } else {
                 std::cerr << "Unexpected keyword: " << token << std::endl;
             }

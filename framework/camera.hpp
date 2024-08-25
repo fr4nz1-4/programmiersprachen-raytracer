@@ -3,11 +3,10 @@
 #include "glm/vec3.hpp"
 
 struct Camera {
-//    glm::vec3 origin = {300, 300, -200.0f};
+    std::string name = " ";
+    float fov = 45.0f; // "field of view" = sichtfeld
     glm::vec3 origin = {0.0f, 0.0f, 0.0f};
-//    glm::vec3 origin = {0.0f, 0.0f, 0.0f};
-//    glm::vec3 direction = {0.0f, 0.0f, a-1.0f};
-//    glm::vec3 up = {0.0f, 1.0f, 0.0f};
-//    float fov = 45.0f;
+    glm::vec3 direction = {0.0f, 0.0f, -1.0f};
+    glm::vec3 up = {0.0f, 1.0f, 0.0f};  // wichtig! weil stand jetzt ist y-Achse umgekehrt (-y ist oben)
 };
 #endif //RAYTRACER_CAMERA_HPP
