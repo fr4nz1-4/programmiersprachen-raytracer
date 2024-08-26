@@ -39,16 +39,42 @@ void Renderer::render() {
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p = {x, y};
-            float xray = (2.0f * p.x) / width_ - 1.0f;
-            float yray = 1.0f - (2.0f * p.y) / height_;
-            float zray = -1.0f;
+//            float xray = (2.0f * p.x) / width_ - 1.0f;
+//            float yray = 1.0f - (2.0f * p.y) / height_;
+//            float zray = -1.0f;
+//            float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * M_PI);
+            float d = width_ / (2* std::tan(scene_.camera_container[0]->fov / 2));
+            float xray = 1.0f * p.x;
+            float yray = 1.0f * p.y;
+            float zray = -d;
+
+            glm::vec3 u = glm::cross(scene_.camera_container[0]->direction, scene_.camera_container[0]->up);
+            glm::mat4 camera_mat;
+            camera_mat[0] = glm::vec4{u, 0};
+            camera_mat[1] = glm::vec4{glm::cross(u, (scene_.camera_container[0]->direction)), 0};
+            camera_mat[2] = glm::vec4{-(scene_.camera_container[0]->direction), 0};
+            camera_mat[3] = glm::vec4{scene_.camera_container[0]->origin, 1};
 
             // Ray from camera through pixel
             glm::vec3 pixel_position = {x, y, 0.0f}; // Position auf Bildfläche
-            glm::vec3 ray_direction = glm::normalize(glm::vec3{xray, yray, zray} - scene_.camera_container[0]->origin);
+            glm::vec4 ray_direction = glm::normalize(glm::vec4{xray, yray, zray, 1});
+            glm::vec4 ray_direction2 = glm::normalize(camera_mat * ray_direction);
+
+            glm::vec3 ray_direction3;
+
+            if (ray_direction2.w != 1) {
+                float a = ray_direction2.x / ray_direction2.w;
+                float b = ray_direction2.y / ray_direction2.w;
+                float c = ray_direction2.z / ray_direction2.w;
+
+                ray_direction3 = {a, b, c};
+            } else {
+                ray_direction3 = {ray_direction2.x, ray_direction2.y, ray_direction2.z};
+            }
+
             //glm::normalize(pixel_position - camera.origin); // Strahlrichtung
 
-            Ray ray = {scene_.camera_container[0]->origin, ray_direction}; // Erstelle den Strahl
+            Ray ray = {scene_.camera_container[0]->origin, ray_direction3}; // Erstelle den Strahl
 
             p.color = background_color; // Initialisiere mit Hintergrundfarbe
             float closest_distance = std::numeric_limits<float>::max(); // Um den nächsten Schnittpunkt zu finden
