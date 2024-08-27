@@ -9,6 +9,7 @@
 
 #include "renderer.hpp"
 #include <vector>
+#include <numbers>
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
   : width_(w)
@@ -24,58 +25,35 @@ Color background_color = {1.0f, 1.0f, 1.0f};
 Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
 
 void Renderer::render() {
-
-//    Light light = {{0.0f, -300.0f, -150.0f}, {1.0f, 1.0f, 1.0f}};
-////    Light light2 = {{00.0f, -400.0f, -150.0f}, {0.5f, 0.5f, 0.5f}};
-//    Light light2 = {{camera.origin}, {0.5f, 0.5f, 0.5f}};
-//
-//    std::vector<Light> light_container;
-//    light_container.push_back(light);
-//    light_container.push_back(light2);
-
-//    glm::vec3 light_position = camera.origin;
+    float pi = 3.14159265358979323846;
     Color ambient_factor = {0.5f, 0.5f, 0.5f}; // Lichtintensität
-
+    
     for (unsigned y = 0; y < height_; ++y) {
-        for (unsigned x = 0; x < width_; ++x) {
-            Pixel p = {x, y};
-//            float xray = (2.0f * p.x) / width_ - 1.0f;
-//            float yray = 1.0f - (2.0f * p.y) / height_;
-//            float zray = -1.0f;
-//            float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * M_PI);
-            float d = width_ / (2* std::tan(scene_.camera_container[0]->fov / 2));
-            float xray = 1.0f * p.x;
-            float yray = 1.0f * p.y;
-            float zray = -d;
+    for (unsigned x = 0; x < width_; ++x) {
+        Pixel p = {x, y};
+        
+       
+        float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * pi);
 
-            glm::vec3 u = glm::cross(scene_.camera_container[0]->direction, scene_.camera_container[0]->up);
-            glm::mat4 camera_mat;
-            camera_mat[0] = glm::vec4{u, 0};
-            camera_mat[1] = glm::vec4{glm::cross(u, (scene_.camera_container[0]->direction)), 0};
-            camera_mat[2] = glm::vec4{-(scene_.camera_container[0]->direction), 0};
-            camera_mat[3] = glm::vec4{scene_.camera_container[0]->origin, 1};
+        glm::vec3 u = glm::normalize(glm::cross(scene_.camera_container[0]->direction, scene_.camera_container[0]->up));
+        glm::vec3 v = glm::normalize(glm::cross(u, scene_.camera_container[0]->direction));
+        glm::vec3 w = -scene_.camera_container[0]->direction;
 
-            // Ray from camera through pixel
-            glm::vec3 pixel_position = {x, y, 0.0f}; // Position auf Bildfläche
-            glm::vec4 ray_direction = glm::normalize(glm::vec4{xray, yray, zray, 1});
-            glm::vec4 ray_direction2 = glm::normalize(camera_mat * ray_direction);
+        glm::mat4 camera_mat;
+        camera_mat[0] = glm::vec4(u, 0.0f);
+        camera_mat[1] = glm::vec4(v, 0.0f);
+        camera_mat[2] = glm::vec4(w, 0.0f);
+        camera_mat[3] = glm::vec4(scene_.camera_container[0]->origin, 1.0f);
 
-            glm::vec3 ray_direction3;
+        glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)), (-(height_ / 2.0f) + float(p.y * 1.0f)), -d}), 0 };// Berechnung der Strahlenrichtung
+        
+        ray_direction = glm::normalize(camera_mat * ray_direction);
+        glm::vec3 ray_direktion1 = glm::vec3{ ray_direction };
 
-            if (ray_direction2.w != 1) {
-                float a = ray_direction2.x / ray_direction2.w;
-                float b = ray_direction2.y / ray_direction2.w;
-                float c = ray_direction2.z / ray_direction2.w;
-
-                ray_direction3 = {a, b, c};
-            } else {
-                ray_direction3 = {ray_direction2.x, ray_direction2.y, ray_direction2.z};
-            }
-
-            //glm::normalize(pixel_position - camera.origin); // Strahlrichtung
-
-            Ray ray = {scene_.camera_container[0]->origin, ray_direction3}; // Erstelle den Strahl
-
+        Ray ray = {scene_.camera_container[0]->origin, ray_direktion1};
+            
+    
+            
             p.color = background_color; // Initialisiere mit Hintergrundfarbe
             float closest_distance = std::numeric_limits<float>::max(); // Um den nächsten Schnittpunkt zu finden
 
@@ -144,6 +122,7 @@ void Renderer::render() {
                         // Setze die endgültige Farbe des Pixels
                         Color cldr = ambient_component + diffuse_component + specular_component;
                         p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};
+                        
                     }
                 }
             }

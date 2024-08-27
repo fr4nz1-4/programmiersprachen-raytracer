@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 {
   unsigned const image_width = 600;
   unsigned const image_height = 600;
-  std::string const filename = "/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/source/scene_2.sdf";
+  std::string const filename = "C:/Users/PC/Desktop/uni/SE/programmiersprachen-raytracer/source/scene_2.sdf";
 //  std::string const filename = "/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/source/test_scene.sdf";
 //  std::string const filename = "scene_2.sdf";
 
