@@ -9,56 +9,298 @@
 
 #include "renderer.hpp"
 #include <vector>
-#include <numbers>
+
+#define PI 3.14159265358979323846f
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
-  : width_(w)
-  , height_(h)
-  , color_buffer_(w*h, Color{0.0, 0.0, 0.0})
-  , filename_(file)
-  , ppm_(width_, height_)
-  , scene_(scene)
-{}
+        : width_(w)
+        , height_(h)
+        , color_buffer_(w * h, Color{0.0, 0.0, 0.0})
+        , filename_(file), ppm_(width_, height_)
+        , scene_(scene) {}
 
 Color background_color = {1.0f, 1.0f, 1.0f};
 //Color background_color = {0.0f, 0.0f, 0.0f};
-Material red = {"red", Color{1, 0, 0}, Color{1, 0, 0}, Color{1, 0, 0}, 20.0f};
+
+Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
+    /*
+    float rad = 45 * PI / 180.0f;
+
+
+    glm::mat4 translate_m = { 1, 0, 0, 3,
+                             0, 1, 0, 0,
+                             0, 0, 1, 2,
+                             0, 0, 0, 1 };
+    glm::mat4 scale_m = { 2, 0, 0, 0,
+                         0, 4, 0, 0,
+                         0, 0, 2, 0,
+                         0, 0, 0, 1 };
+    glm::mat4 rotation_m = { 1, 0, 0, 0,
+                            0, std::cos(rad), -std::sin(rad), 0,
+                            0, std::sin(rad), std::cos(rad), 0,
+                            0, 0, 0, 1 };
+
+    glm::mat4 world_transform = translate_m * rotation_m * scale_m;
+    glm::mat4 trans_inv = glm::inverse(world_transform);
+    */
+
+
+
+
+
+    glm::vec4 transformed_origin = mat * glm::vec4{ray.origin, 1.0f};
+    glm::vec4 transformed_direction = mat * glm::vec4{ray.direction, 0.0f};
+
+    return Ray{glm::vec3{transformed_origin}, glm::normalize(glm::vec3{transformed_direction})};
+}
+/*
+Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float const& distance) {
+    HitPoint hit = shape->intersect(ray);
+    glm::vec3 intersection_point = hit.intersection_point;
+
+    // Normale berechnen
+    glm::vec3 normal = shape->normal(intersection_point);
+
+    // Berechne die transponierte Inverse der Welt-Transformationsmatrix
+    glm::mat4 world_transform_inv_transpose = glm::transpose(shape->get_world_transformation_inv());
+
+    // Transformiere die Normale mit der transponierten Inversen
+    glm::vec4 transformed_normal = world_transform_inv_transpose * glm::vec4(normal, 0.0f);
+    normal = glm::normalize(glm::vec3(transformed_normal));
+
+    // Ambient Component
+    Color ambient_factor = { 0.5f, 0.5f, 0.5f };
+    Color ambient_component = {
+        ambient_factor.r * shape->get_Material()->ka.r,
+        ambient_factor.g * shape->get_Material()->ka.g,
+        ambient_factor.b * shape->get_Material()->ka.b
+    };
+
+    Color diffuse_component = { 0, 0, 0 };
+    Color specular_component = { 0, 0, 0 };
+
+    // Lichtberechnung
+    for (auto const& light : scene_.light_container) {
+        glm::vec3 light_dir = glm::normalize(light->position - intersection_point);
+        glm::vec3 test2 = intersection_point + 0.1f * normal;
+
+        Ray shadow_ray = { test2, light_dir };
+        bool in_shadow = false;
+
+        for (auto const& shape_other : scene_.shape_container) {
+            if (shape != shape_other) {
+                auto shadow_hit = shape_other->intersect(shadow_ray);
+                if (shadow_hit.intersection) {
+                    in_shadow = true;
+                    break;
+                }
+            }
+        }
+
+        if (!in_shadow) {
+            // Diffuse Beleuchtung
+            float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
+            Color diffuse_component_tmp = {
+                light->color.r * light->brightness * shape->get_Material()->kd.r * diffuse_factor,
+                light->color.g * light->brightness * shape->get_Material()->kd.g * diffuse_factor,
+                light->color.b * light->brightness * shape->get_Material()->kd.b * diffuse_factor
+            };
+            diffuse_component = diffuse_component + diffuse_component_tmp;
+
+            // Spekulare Beleuchtung
+            glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
+            glm::vec3 v = glm::normalize(scene_.camera_container[0]->origin - intersection_point);
+
+            float specular_factor = std::pow(std::max(glm::dot(r, v), 0.0f), shape->get_Material()->m);
+            Color specular_component_tmp = {
+                light->color.r * light->brightness * specular_factor,
+                light->color.g * light->brightness * specular_factor,
+                light->color.b * light->brightness * specular_factor
+            };
+
+            specular_component = specular_component + specular_component_tmp;
+        }
+    }
+
+    return ambient_component + diffuse_component + specular_component;
+}*/
+
+Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float const& distance) {
+    HitPoint hit = shape->intersect(ray);
+//    glm::vec3 intersection_point = ray.origin + ray.direction * distance;
+    glm::vec3 normal = shape->normal(hit.intersection_point);
+
+    Color ambient_factor = {0.5f, 0.5f, 0.5f};
+    Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
+                               ambient_factor.g * shape->get_Material()->ka.g,
+                               ambient_factor.b * shape->get_Material()->ka.b};
+
+    Color diffuse_component = {0, 0, 0};
+    Color specular_component = {0, 0, 0};
+
+    for (auto const& light : scene_.light_container) {
+        glm::vec3 light_dir = glm::normalize(light->position - hit.intersection_point);
+        glm::vec3 test2 = hit.intersection_point + 0.1f * normal;
+
+        Ray shadow_ray = {test2, light_dir};
+        bool in_shadow = false;
+
+        for (auto const& shape_other : scene_.shape_container) {
+            if (shape != shape_other) {
+                auto shadow_hit = shape_other->intersect(shadow_ray);
+                if (shadow_hit.intersection) {
+                    in_shadow = true;
+                    break;
+                }
+            }
+        }
+
+        if (!in_shadow) {
+            // Diffuse Beleuchtung
+            float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
+            Color diffuse_component_tmp = {
+                    light->color.r * light->brightness * shape->get_Material()->kd.r * diffuse_factor,
+                    light->color.g * light->brightness * shape->get_Material()->kd.g * diffuse_factor,
+                    light->color.b * light->brightness * shape->get_Material()->kd.b * diffuse_factor};
+            diffuse_component = diffuse_component + diffuse_component_tmp;
+
+            // Spekulare Beleuchtung
+            glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
+            glm::vec3 v = glm::normalize(scene_.camera_container[0]->origin - hit.intersection_point);
+
+            float specular_factor = std::pow(std::max(glm::dot(r, v), 0.0f), shape->get_Material()->m);
+            Color specular_component_tmp = {
+                    light->color.r * light->brightness * specular_factor,
+                    light->color.g * light->brightness * specular_factor,
+                    light->color.b * light->brightness * specular_factor};
+
+            specular_component = specular_component + specular_component_tmp;
+        }
+    }
+    return {ambient_component + diffuse_component + specular_component};
+}
+
+Color Renderer::trace(Ray const& ray) {
+    float closest_distance = std::numeric_limits<float>::max();
+    std::shared_ptr<Shape> closest_shape = nullptr;
+    glm::vec3 normal;
+
+    for (auto const& shape : scene_.shape_container) {
+        glm::mat4 test_mat;
+        HitPoint hit = shape->intersect(ray);
+        Ray transformed_ray;
+        if (shape->get_world_transformation() != test_mat) {
+            transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray);
+            hit = shape->intersect(transformed_ray);
+            glm::vec4 result = glm::vec4{hit.intersection_point, 0.0f} * shape->get_world_transformation(); //0.0f oder 1.0f im vec 4 ?? 
+            hit.intersection_point = glm::vec3{result};
+
+
+            /*
+            //für die normale /experimentel
+            glm::mat4 world_transform_inv_transpose = glm::transpose(shape->get_world_transformation_inv());
+            glm::vec3 normalo= shape->normal(hit.intersection_point);
+            glm::vec4 temp_final_normal = glm::vec4{ normalo,1.0f } * world_transform_inv_transpose;
+            glm::vec3 normal = glm::vec3{ temp_final_normal };
+            */
+            
+            
+            
+            std::cout << hit.intersection << std::endl;
+//            std::cout << "test"<< std::endl;
+        }
+        
+
+        if (hit.intersection) {
+            float distance = glm::length(hit.intersection_point - scene_.camera_container[0]->origin);
+            if (distance < closest_distance) {
+                closest_distance = distance;
+                closest_shape = shape;
+            }
+        }
+    }
+
+    if (closest_shape) {
+        
+        return shade(ray, closest_shape, closest_distance);
+    } else {
+        return background_color;
+    }
+}
 
 void Renderer::render() {
-    float pi = 3.14159265358979323846;
-    Color ambient_factor = {0.5f, 0.5f, 0.5f}; // Lichtintensität
-    
+    Camera camera = *scene_.camera_container[0];
+
     for (unsigned y = 0; y < height_; ++y) {
-    for (unsigned x = 0; x < width_; ++x) {
-        Pixel p = {x, y};
-        
-       
-        float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * pi);
+        for (unsigned x = 0; x < width_; ++x) {
+            Pixel p = {x, y};
 
-        glm::vec3 u = glm::normalize(glm::cross(scene_.camera_container[0]->direction, scene_.camera_container[0]->up));
-        glm::vec3 v = glm::normalize(glm::cross(u, scene_.camera_container[0]->direction));
-        glm::vec3 w = -scene_.camera_container[0]->direction;
+            float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * PI);
 
-        glm::mat4 camera_mat;
-        camera_mat[0] = glm::vec4(u, 0.0f);
-        camera_mat[1] = glm::vec4(v, 0.0f);
-        camera_mat[2] = glm::vec4(w, 0.0f);
-        camera_mat[3] = glm::vec4(scene_.camera_container[0]->origin, 1.0f);
+            glm::vec3 u = glm::normalize(glm::cross(camera.direction, camera.up));
+            glm::mat4 camera_mat;
+            camera_mat[0] = glm::vec4{u, 0};
+            camera_mat[1] = glm::vec4{glm::cross(u, (camera.direction)), 0};
+            camera_mat[2] = glm::vec4{-(camera.direction), 0};
+            camera_mat[3] = glm::vec4{camera.origin, 1};
 
-        glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)), (-(height_ / 2.0f) + float(p.y * 1.0f)), -d}), 0 };// Berechnung der Strahlenrichtung
-        
-        ray_direction = glm::normalize(camera_mat * ray_direction);
-        glm::vec3 ray_direktion1 = glm::vec3{ ray_direction };
+            // Berechnung der Strahlenrichtung
+            glm::vec4 ray_direction{glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)),
+                                                             (-(height_ / 2.0f) + float(p.y * 1.0f)),
+                                                             - d}), 0};
 
-        Ray ray = {scene_.camera_container[0]->origin, ray_direktion1};
-            
-    
-            
+            ray_direction = glm::normalize(camera_mat * ray_direction);
+
+            p.color = background_color; // Initialisiere mit Hintergrundfarbe
+
+            Ray ray = {camera.origin, glm::vec3{ray_direction}}; // Multiplikation mit Inverser Worldmatrix
+
+            Color clr = trace(ray);
+
+            // Hintergrundfarbe wird nicht verändert (oder in shade() anpassen)
+            if (clr.r != background_color.r && clr.g != background_color.g && clr.b != background_color.b) {
+                p.color = Color{clr.r / (clr.r + 1), clr.g / (clr.g + 1), clr.b / (clr.b + 1)};
+            }
+
+            // Hintergrundfarbe wird auch verändert -> weiß wird zu grau
+            // p.color = Color{clr.r / (clr.r+1), clr.g / (clr.g+1), clr.b / (clr.b+1)};
+
+            write(p);  // Schreibe die Farbe des Pixels in das Bild
+        }
+    }
+//    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
+}
+
+/* // alte render()-Methode
+void Renderer::render() {
+    Color ambient_factor = {0.5f, 0.5f, 0.5f}; // ambiente Lichtintensität
+    Camera camera = *scene_.camera_container[0];
+
+    for (unsigned y = 0; y < height_; ++y) {
+        for (unsigned x = 0; x < width_; ++x) {
+            Pixel p = {x, y};
+
+            float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2) / 180 * PI);
+
+            glm::vec3 u = glm::normalize(glm::cross(camera.direction, camera.up));
+            glm::mat4 camera_mat;
+            camera_mat[0] = glm::vec4{u, 0};
+            camera_mat[1] = glm::vec4{glm::cross(u, (camera.direction)), 0};
+            camera_mat[2] = glm::vec4{-(camera.direction), 0};
+            camera_mat[3] = glm::vec4{camera.origin, 1};
+
+            glm::vec4 ray_direction{glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)), (-(height_ / 2.0f) + float(p.y * 1.0f)), - d}), 0};// Berechnung der Strahlenrichtung
+
+            ray_direction = glm::normalize(camera_mat * ray_direction);
+            glm::vec3 ray_direktion1 = glm::vec3{ray_direction};
+
+            Ray ray = {scene_.camera_container[0]->origin, ray_direktion1};
+
             p.color = background_color; // Initialisiere mit Hintergrundfarbe
             float closest_distance = std::numeric_limits<float>::max(); // Um den nächsten Schnittpunkt zu finden
 
             // Überprüfe alle Objekte in der Szene
-            for (auto const& shape : scene_.shape_container) {
+            for (auto const& shape: scene_.shape_container) {
                 auto hit = shape->intersect(ray);
                 if (hit.intersection) {
                     float distance = glm::length(hit.intersection_point - scene_.camera_container[0]->origin);
@@ -122,7 +364,7 @@ void Renderer::render() {
                         // Setze die endgültige Farbe des Pixels
                         Color cldr = ambient_component + diffuse_component + specular_component;
                         p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};
-                        
+
                     }
                 }
             }
@@ -131,16 +373,16 @@ void Renderer::render() {
     }
 //    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
 }
+*/
 
-void Renderer::write(Pixel const& p)
-{
+void Renderer::write(Pixel const &p) {
     // flip pixels, because of opengl glDrawPixels
-    size_t buf_pos = (width_*p.y + p.x);
-    if (buf_pos >= color_buffer_.size() || (int)buf_pos < 0) {
+    size_t buf_pos = (width_ * p.y + p.x);
+    if (buf_pos >= color_buffer_.size() || (int) buf_pos < 0) {
         std::cerr << "Fatal Error Renderer::write(Pixel p) : "
-        << "pixel out of ppm_ : "
-        << (int)p.x << "," << (int)p.y
-        << std::endl;
+                  << "pixel out of ppm_ : "
+                  << (int) p.x << "," << (int) p.y
+                  << std::endl;
     } else {
         color_buffer_[buf_pos] = p.color;
     }

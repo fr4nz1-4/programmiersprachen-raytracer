@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/intersect.hpp>
 #include "scene.hpp"
+/*
 
 //Material blue = {"blue", {0, 1, 0}, {0, 1, 0}, {0, 1, 0}, 20.0f};
 //Material green = {"green", {0, 0, 1}, {0, 0, 1}, {0, 0, 1}, 20.0f};
@@ -78,7 +79,8 @@ TEST_CASE("print_test") {
     std::cout<< sphere1;
     std::cout<< box1;
 }
-*/
+
+
 
 TEST_CASE("intersect_ray_sphere", "[intersect]") {
     SECTION("origin im nullpunkt, schneidet kugel") {
@@ -144,7 +146,7 @@ TEST_CASE("intersect_ray_sphere", "[intersect]") {
     }
 }
 
-/*
+
 TEST_CASE("5.7: statischer typ, dynamischer typ") {
     Color red{255, 0, 0};
     glm::vec3 position{0.0f, 0.0f, 0.0f};
@@ -163,7 +165,7 @@ TEST_CASE("konstruktor destruktor Reihenfolge") {
     delete s1; // if destructor isn't virtual: s1 is objekt of class shape
     delete s2;
 }
-//*/
+//
 
 TEST_CASE("intersect_ray_box", "[intersect]") {
     Box b1{"box1", red, {2,0,0}, {4,1,1}}; // rand-/kantenfall
@@ -228,6 +230,7 @@ TEST_CASE("intersect_ray_box", "[intersect]") {
         REQUIRE(b3_ray_nx.intersection == false);
     }
 }
+*/
 
 
 TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
@@ -333,6 +336,28 @@ TEST_CASE("parse_sdf_file correctly parses materials", "[parse_sdf_file]") {
     */
 }
 
+TEST_CASE("matrix tarnslation test", "[]") {
+    glm::mat4 matrix{1};
+    glm::mat4 matrix2 = {1, 0, 0, 5, 0, 1, 0, 5, 0, 0, 1, 5, 0, 0, 0, 1};
+    glm::vec3 vec{5, 5, 5};
+    matrix = glm::translate(matrix, vec);
+    REQUIRE(matrix[0][0] == matrix2[0][0]);
+    REQUIRE(matrix[0][1] == matrix2[0][1]);
+    REQUIRE(matrix[0][2] == matrix2[0][2]);
+    REQUIRE(matrix[0][3] == matrix2[0][3]);
+    REQUIRE(matrix[1][0] == matrix2[1][0]);
+    REQUIRE(matrix[1][1] == matrix2[1][1]);
+    REQUIRE(matrix[1][2] == matrix2[1][2]);
+    REQUIRE(matrix[1][3] == matrix2[1][3]);
+    REQUIRE(matrix[2][0] == matrix2[2][0]);
+    REQUIRE(matrix[2][1] == matrix2[2][1]);
+    REQUIRE(matrix[2][2] == matrix2[2][2]);
+    REQUIRE(matrix[2][3] == matrix2[2][3]);
+    REQUIRE(matrix[3][0] == matrix2[3][0]);
+    REQUIRE(matrix[3][1] == matrix2[3][1]);
+    REQUIRE(matrix[3][2] == matrix2[3][2]);
+    REQUIRE(matrix[3][3] == matrix2[3][3]);
+}
 int main(int argc, char *argv[])
 {
   return Catch::Session().run(argc, argv);

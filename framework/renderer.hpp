@@ -27,9 +27,12 @@ class Renderer
 public:
   Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene);
   void render();
+  Color trace(Ray const& ray);
+  Color shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float const& distance);
   void write(Pixel const& p);
+  Ray transform_ray(glm::mat4 const& mat, Ray const& ray);
 
-  inline std::vector<Color> const& color_buffer() const
+        inline std::vector<Color> const& color_buffer() const
   {
     return color_buffer_;
   }

@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#define PI 3.14159265358979323846f
 
 std::shared_ptr<Material> find_material(Scene const& scene, std::string const& material_name) {
     // material in material_container finden
@@ -11,6 +12,78 @@ std::shared_ptr<Material> find_material(Scene const& scene, std::string const& m
             return material;
         }
     }
+}
+
+std::shared_ptr<Shape> find_shape(Scene const& scene, std::string const& shape_name) {
+    // material in material_container finden
+    std::shared_ptr<Shape> shape = nullptr;
+    // Schleife die über alle Materiale im material_container iteriert
+    for (auto const& shape1 : scene.shape_container) {
+        // wenn mat mit material_name übereinstimmt, ist das das gesucht material
+        if (shape1->get_name() == shape_name) {
+            shape = shape1;
+            return shape;
+        }
+    }
+}
+
+void make_world_transform(std::shared_ptr<Shape> shape, glm::vec3 const& scale, glm::vec3 const& translate, float const& rot_degree, glm::vec3 const& rotate) {
+    float rad = rot_degree * PI / 180.0f;
+    
+    /*
+    float rad = 45 * PI / 180.0f;
+
+
+    glm::mat4 translate_m = { 1, 0, 0, 3,
+                             0, 1, 0, 0,
+                             0, 0, 1, 2,
+                             0, 0, 0, 1 };
+    glm::mat4 scale_m = { 2, 0, 0, 0,
+                         0, 4, 0, 0,
+                         0, 0, 2, 0,
+                         0, 0, 0, 1 };
+    glm::mat4 rotation_m = { 1, 0, 0, 0,
+                            0, std::cos(rad), -std::sin(rad), 0,
+                            0, std::sin(rad), std::cos(rad), 0,
+                            0, 0, 0, 1 };
+
+    glm::mat4 world_transform = translate_m * rotation_m * scale_m;
+    glm::mat4 trans_inv = glm::inverse(world_transform);
+    */
+    glm::mat4 translate_m = {1, 0, 0, translate.x,
+                             0, 1, 0, translate.y,
+                             0, 0, 1, translate.z,
+                             0, 0, 0, 1};
+    glm::mat4 scale_m = {scale.x, 0, 0, 0,
+                         0, scale.y, 0, 0,
+                         0, 0, scale.z, 0,
+                         0, 0, 0, 1};
+    glm::mat4 rotation_m = {1, 0, 0, 0,
+                            0, std::cos(rad), -std::sin(rad), 0,
+                            0, std::sin(rad), std::cos(rad), 0,
+                            0, 0, 0, 1};
+    /*
+    glm::mat4 minus_translate_m = { 1, 0, 0, -translate.x,
+                             0, 1, 0, -translate.y,
+                             0, 0, 1, -translate.z,
+                             0, 0, 0, 1 };
+
+    glm::mat4 minus_scale_m = { 1/scale.x, 0, 0, 0,
+                         0, 1/scale.y, 0, 0,
+                         0, 0, 1/scale.z, 0,
+                         0, 0, 0, 1 };
+    glm::mat4 minus_rotation_m = { 1, 0, 0, 0,
+                            0, std::cos(rad), std::sin(rad), 0,
+                            0, -std::sin(rad), std::cos(rad), 0,
+                            0, 0, 0, 1 };
+
+    //glm::mat4 trans_inv = minus_scale_m * minus_rotation_m * minus_translate_m;
+    */
+
+    glm::mat4 world_transform = translate_m * rotation_m * scale_m;
+    glm::mat4 trans_inv = glm::inverse(world_transform);
+    shape->set_world_transformation_(world_transform);
+    shape->set_world_transformation_inv(trans_inv); // evtl. fehlerhaft
 }
 
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
@@ -65,7 +138,8 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                 // push material into scene
                 scene.material_container.push_back(parsed_material);
 
-            } else if ("shape" == token) {
+            }
+            else if ("shape" == token) {
                 std::string shape_type;
                 line_as_stream >> shape_type;
 
@@ -90,10 +164,12 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                     if (material != nullptr) {
                         auto parsed_box = std::make_shared<Box>(name, material, min, max);
                         scene.shape_container.push_back(parsed_box);
-                    } else {
+                    }
+                    else {
                         std::cerr << "Material not found: " << material_name << std::endl;
                     }
-                } else if ("sphere" == shape_type) {
+                }
+                else if ("sphere" == shape_type) {
                     std::string name;
                     std::string material_name;
                     glm::vec3 center;
@@ -112,11 +188,13 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                     if (material != nullptr) {
                         auto parsed_sphere = std::make_shared<Sphere>(name, material, center, radius);
                         scene.shape_container.push_back(parsed_sphere);
-                    } else {
+                    }
+                    else {
                         std::cerr << "Material not found: " << material_name << std::endl;
                     }
                 }
-            } else if ("light" == token) {
+            }
+            else if ("light" == token) {
                 std::shared_ptr<Light> parsed_light = std::make_shared<Light>();
 
                 line_as_stream >> parsed_light->name;
@@ -129,7 +207,8 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                 line_as_stream >> parsed_light->brightness;
 
                 scene.light_container.push_back(parsed_light);
-            } else if ("camera" == token) {
+            }
+            else if ("camera" == token) {
                 std::shared_ptr<Camera> parsed_camera = std::make_shared<Camera>();
 
                 line_as_stream >> parsed_camera->name;
@@ -145,10 +224,65 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
                 line_as_stream >> parsed_camera->up.z;
 
                 scene.camera_container.push_back(parsed_camera);
-            } else {
+            }
+            else {
                 std::cerr << "Unexpected keyword: " << token << std::endl;
             }
-        } else {
+            /*
+        } else if ("transform" == token) {
+            std::string shape_name;
+            glm::vec3 scale;
+            glm::vec3 translate;
+            glm::vec3 rotate;
+            float rot_degree;
+            line_as_stream >> shape_name;
+            line_as_stream >> token;
+            if ("scale" == token) {
+                line_as_stream >> scale.x;
+                line_as_stream >> scale.y;
+                line_as_stream >> scale.z;
+            }
+            if ("translate" == token) {
+                line_as_stream >> translate.x;
+                line_as_stream >> translate.y;
+                line_as_stream >> translate.z;
+            }
+            if ("rotate" == token) {
+                line_as_stream >> rot_degree;
+                line_as_stream >> rotate.x;
+                line_as_stream >> rotate.y;
+                line_as_stream >> rotate.z;
+            }*/
+        }else if ("transform" == token) {
+                std::string shape_name;
+                glm::vec3 scale = glm::vec3(1.0f); // Default-Wert (Einheits-Skalierung)
+                glm::vec3 translate = glm::vec3(0.0f); // Default-Wert (Keine Translation)
+                glm::vec3 rotate = glm::vec3(0.0f); // Default-Wert (Keine Rotation)
+                float rot_degree = 0.0f;
+
+                line_as_stream >> shape_name;
+                line_as_stream >> token;
+
+                if ("scale" == token) {
+                    line_as_stream >> scale.x >> scale.y >> scale.z;
+                }
+                else if ("translate" == token) {
+                    line_as_stream >> translate.x >> translate.y >> translate.z;
+                }
+                else if ("rotate" == token) {
+                    line_as_stream >> rot_degree >> rotate.x >> rotate.y >> rotate.z;
+                }
+
+
+            std::shared_ptr<Shape> shape = find_shape(scene, shape_name);
+            if (shape != nullptr) {
+                make_world_transform(shape, scale, translate, rot_degree, rotate);
+            } else {
+                std::cerr << "shape not found: " << shape_name << std::endl;
+            }
+        }
+
+        else {
             std::cerr << "Unexpected keyword: " << token << std::endl;
         }
     }

@@ -1,0 +1,188 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						3,
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "external/glfw-3.2.1",
+					"childIndexes" : 
+					[
+						2
+					],
+					"jsonFile" : "directory-external.glfw-3.2.1-Release-d7d3409b98715e345536.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "external/glfw-3.2.1"
+				},
+				{
+					"build" : "external/glfw-3.2.1/src",
+					"jsonFile" : "directory-external.glfw-3.2.1.src-Release-7ecef11e5eaa7048436d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8.12"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "external/glfw-3.2.1/src",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "framework",
+					"jsonFile" : "directory-framework-Release-308e10f56f9c91364e93.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "framework",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "source",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-source-Release-f40f294336e818fdb7b1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "source",
+					"targetIndexes" : 
+					[
+						0,
+						4,
+						5
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						3,
+						4
+					],
+					"name" : "raytracer",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "GLFW",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 4,
+					"id" : "example::@411ffd8adc737496fe19",
+					"jsonFile" : "target-example-Release-04a19257b9ffb2630298.json",
+					"name" : "example",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "framework::@217a96c3a62328a73ef4",
+					"jsonFile" : "target-framework-Release-a255f235f564994a6c74.json",
+					"name" : "framework",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "glfw::@4cb2830a7239d3fc369d",
+					"jsonFile" : "target-glfw-Release-bb0af539543d04c47664.json",
+					"name" : "glfw",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "nanovg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-nanovg-Release-51d82ec51b2f18bbf4fc.json",
+					"name" : "nanovg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "raytracer::@411ffd8adc737496fe19",
+					"jsonFile" : "target-raytracer-Release-8e34d86d287cc53f2cc1.json",
+					"name" : "raytracer",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "tests::@411ffd8adc737496fe19",
+					"jsonFile" : "target-tests-Release-3729e49b58f32c22a746.json",
+					"name" : "tests",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/franziskapobering/repositories/programmiersprachen/programmiersprachen-raytracer/cmake-build-release",
+		"source" : "/Users/franziskapobering/repositories/programmiersprachen/programmiersprachen-raytracer"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

@@ -6,6 +6,7 @@
 #include "hitpoint.hpp"
 #include "ray.hpp"
 #include "material.hpp"
+#include "glm/matrix.hpp"
 
 class Shape {
 public:
@@ -18,11 +19,17 @@ public:
     virtual ~Shape();
     std::shared_ptr<Material> get_Material() const;
     std::string get_name() const;
+    void set_world_transformation_(glm::mat4 matrix);
+    void set_world_transformation_inv(glm::mat4 matti);
+    glm::mat4 get_world_transformation();
+    glm::mat4 get_world_transformation_inv();
 //    friend class Scene;
 
 protected:
     std::string name_;
     std::shared_ptr<Material> material_;
+    glm::mat4 world_transformation_;
+    glm::mat4 world_transformation_inv;
 };
 
 std::ostream& operator<<(std::ostream& os, Shape const& shape);
