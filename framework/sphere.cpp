@@ -32,6 +32,7 @@ HitPoint Sphere::intersect(Ray const& ray) const {
     HitPoint h;
     auto normalized_direction = glm::normalize(ray.direction);
 
+
     h.intersection = glm::intersectRaySphere(ray.origin, normalized_direction, center_, radius_ * radius_, distance);
     if(h.intersection) {
         h.distance = distance;
@@ -40,7 +41,7 @@ HitPoint Sphere::intersect(Ray const& ray) const {
         h.intersection_point = ray.origin + distance * ray.direction;
         h.direction = normalized_direction;
     }
-    h.normale =glm::normalize (normal(h.intersection_point));
+    h.normale = glm::normalize (normal(h.intersection_point));
     return h;
 }
 

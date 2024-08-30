@@ -131,30 +131,32 @@ HitPoint Box::intersect(const Ray &ray) const {
 
 glm::vec3 Box::normal(glm::vec3 const& point) const  {
     // Die Box hat 6 Flächen: 2x x=const, 2x y=const, 2x z=const
-
+    //return glm::vec3(1.0f, 0.0f, 0.0f);
     // abstand von intersectionpoint zu Box-Flächen
-    float epsilon = 1e-6f; // Kleinster Wert, um numerische Fehler zu vermeiden
+    float epsilon = 1e-6f * 10.0f; // Kleinster Wert, um numerische Fehler zu vermeiden
 
-    if (std::abs(point.x - min_.x) < epsilon) {
+    if (std::abs(point.x - min_.x) <= epsilon) {
         // Linke Fläche der Box
         return glm::vec3(-1.0f, 0.0f, 0.0f);
-    } else if (std::abs(point.x - max_.x) < epsilon) {
+    } else if (std::abs(point.x - max_.x) <= epsilon) {
         // Rechte Fläche der Box
         return glm::vec3(1.0f, 0.0f, 0.0f);
-    } else if (std::abs(point.y - min_.y) < epsilon) {
+    } else if (std::abs(point.y - min_.y) <= epsilon) {
         // Untere Fläche der Box
         return glm::vec3(0.0f, -1.0f, 0.0f);
-    } else if (std::abs(point.y - max_.y) < epsilon) {
+    } else if (std::abs(point.y - max_.y) <= epsilon) {
         // Obere Fläche der Box
         return glm::vec3(0.0f, 1.0f, 0.0f);
-    } else if (std::abs(point.z - min_.z) < epsilon) {
+    } else if (std::abs(point.z - min_.z) <= epsilon) {
         // Vorderfläche der Box
         return glm::vec3(0.0f, 0.0f, -1.0f);
-    } else if (std::abs(point.z - max_.z) < epsilon) {
+    } else if (std::abs(point.z - max_.z) <= epsilon) {
         // Rückfläche der Box
         return glm::vec3(0.0f, 0.0f, 1.0f);
     } else {
-        // Ausnahmefall: Punkt außerhalb der Box
+        // Ausnahmefall: Punkt außerhalb der Boxs
+        
+
         return glm::vec3(0.0f, 0.0f, 0.0f);
     }
 }

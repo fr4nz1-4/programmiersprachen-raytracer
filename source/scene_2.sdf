@@ -5,14 +5,18 @@ define material blue 0 0 1 0 0 1 0 0 1 10
 define material gray 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 10
 # shapes
 #define shape box box1 red -100 -80 -200 100 80 -100
-define shape box box1 red -50 -40 -200 50 40 -100
-define shape sphere sphere1 blue 0 0 -100 50
+#define shape box box1 red -50 -40 -200 50 40 -100
+define shape box box1 red -0.5 -0.5 -0.5 0.5 0.5 0.5
+#define shape sphere sphere1 blue 0 0 0 50
 # light
 define light light1 0.0 200.0 -150.0 1.0 1.0 1.0 1.0
-#define light light2 0.0 0.0 0.0 0.5 0.5 0.5 1.0
+define light light2 0.0 0.0 0.0 0.5 0.5 0.5 1.0
 # camera
 define camera camera1 90.0 0.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0
 # transform name transformation parameter
-transform box1 scale 4 4 4
-transform box1 translate 3 0 52
-transform box1 rotate 45 1 0 0
+ transform sphere1 scale 0.5 1.0 1.0
+ #transform sphere1 rotate 45 0.0 0.0 1.0
+ transform sphere1 translate 0.0 0.0 -100.0
+#transform box1 translate 25 0 0
+ transform box1 rotate 45 1 0 0
+transform box1 translate 0 0 -2

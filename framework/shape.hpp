@@ -29,8 +29,8 @@ private:
 protected:
     std::string name_;
     std::shared_ptr<Material> material_;
-    glm::mat4 world_transformation_;
-    glm::mat4 world_transformation_inv;
+    glm::mat4 world_transformation_ = glm::mat4(1.0f);
+    glm::mat4 world_transformation_inv = glm::mat4(1.0f);;
 };
 
 

@@ -1,6 +1,8 @@
 #include "scene.hpp"
 #define PI 3.14159265358979323846f
 
+#include <glm/gtx/string_cast.hpp>
+
 std::shared_ptr<Material> find_material(Scene const& scene, std::string const& material_name) {
     // material in material_container finden
     std::shared_ptr<Material> material = nullptr;
@@ -80,7 +82,13 @@ void make_world_transform(std::shared_ptr<Shape> shape, glm::vec3 const& scale, 
     //glm::mat4 trans_inv = minus_scale_m * minus_rotation_m * minus_translate_m;
     */
 
-    glm::mat4 world_transform = translate_m * rotation_m * scale_m;
+   
+
+    glm::mat4 world_transform = glm::transpose(translate_m) * glm::transpose(rotation_m) * glm::transpose(scale_m);
+
+    //std::cout << glm::to_string(world_transform) << std::endl;
+
+    //world_transform = glm::transpose(world_transform);
     shape->set_world_transformation(world_transform);
 }
 

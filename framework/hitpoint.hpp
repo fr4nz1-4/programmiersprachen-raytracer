@@ -18,5 +18,5 @@ struct HitPoint {
     glm::vec3 normale = { 0.0f,0.0f,0.0f };
 };
 
-HitPoint transform(glm::mat4 const& mat, HitPoint const& hp);
+HitPoint transform(glm::mat4 const& world_mat, glm::mat4 const& transposed_inverse_world_mat, HitPoint const& hp);
 #endif //RAYTRACER_HITPOINT_HPP
