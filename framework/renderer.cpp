@@ -206,7 +206,7 @@ Color Renderer::trace(Ray const& ray) {
             
             
             
-            std::cout << hit.intersection << std::endl;
+            //std::cout << hit.intersection << std::endl;
 //            std::cout << "test"<< std::endl;
         }
         
