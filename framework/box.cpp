@@ -122,13 +122,14 @@ HitPoint Box::intersect(const Ray &ray) const {
     hitpoint.name = name_;
     hitpoint.material = material_;
     hitpoint.direction = direction;
+    hitpoint.normale = glm::normalize(normal(hitpoint.intersection_point));
 
 //    std::cout<< hitpoint.distance << " | " << hitpoint.intersection_point.x << ", " << hitpoint.intersection_point.y << ", " << hitpoint.intersection_point.z << "\n";
 
     return hitpoint;
 }
 
-glm::vec3 Box::normal(glm::vec3 const& point) {
+glm::vec3 Box::normal(glm::vec3 const& point) const  {
     // Die Box hat 6 Flächen: 2x x=const, 2x y=const, 2x z=const
 
     // abstand von intersectionpoint zu Box-Flächen

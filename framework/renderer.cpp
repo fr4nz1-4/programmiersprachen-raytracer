@@ -10,6 +10,7 @@
 #include "renderer.hpp"
 #include <vector>
 
+
 #define PI 3.14159265358979323846f
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
@@ -23,112 +24,28 @@ Color background_color = {1.0f, 1.0f, 1.0f};
 //Color background_color = {0.0f, 0.0f, 0.0f};
 
 Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
-    /*
-    float rad = 45 * PI / 180.0f;
-
-
-    glm::mat4 translate_m = { 1, 0, 0, 3,
-                             0, 1, 0, 0,
-                             0, 0, 1, 2,
-                             0, 0, 0, 1 };
-    glm::mat4 scale_m = { 2, 0, 0, 0,
-                         0, 4, 0, 0,
-                         0, 0, 2, 0,
-                         0, 0, 0, 1 };
-    glm::mat4 rotation_m = { 1, 0, 0, 0,
-                            0, std::cos(rad), -std::sin(rad), 0,
-                            0, std::sin(rad), std::cos(rad), 0,
-                            0, 0, 0, 1 };
-
-    glm::mat4 world_transform = translate_m * rotation_m * scale_m;
-    glm::mat4 trans_inv = glm::inverse(world_transform);
-    */
-
-
-
-
 
     glm::vec4 transformed_origin = mat * glm::vec4{ray.origin, 1.0f};
     glm::vec4 transformed_direction = mat * glm::vec4{ray.direction, 0.0f};
 
-    return Ray{glm::vec3{transformed_origin}, glm::normalize(glm::vec3{transformed_direction})};
+    return Ray{glm::vec3{transformed_origin}, (glm::vec3{transformed_direction})};
 }
-/*
-Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float const& distance) {
-    HitPoint hit = shape->intersect(ray);
-    glm::vec3 intersection_point = hit.intersection_point;
 
-    // Normale berechnen
-    glm::vec3 normal = shape->normal(intersection_point);
-
-    // Berechne die transponierte Inverse der Welt-Transformationsmatrix
-    glm::mat4 world_transform_inv_transpose = glm::transpose(shape->get_world_transformation_inv());
-
-    // Transformiere die Normale mit der transponierten Inversen
-    glm::vec4 transformed_normal = world_transform_inv_transpose * glm::vec4(normal, 0.0f);
-    normal = glm::normalize(glm::vec3(transformed_normal));
-
-    // Ambient Component
-    Color ambient_factor = { 0.5f, 0.5f, 0.5f };
-    Color ambient_component = {
-        ambient_factor.r * shape->get_Material()->ka.r,
-        ambient_factor.g * shape->get_Material()->ka.g,
-        ambient_factor.b * shape->get_Material()->ka.b
-    };
-
-    Color diffuse_component = { 0, 0, 0 };
-    Color specular_component = { 0, 0, 0 };
-
-    // Lichtberechnung
-    for (auto const& light : scene_.light_container) {
-        glm::vec3 light_dir = glm::normalize(light->position - intersection_point);
-        glm::vec3 test2 = intersection_point + 0.1f * normal;
-
-        Ray shadow_ray = { test2, light_dir };
-        bool in_shadow = false;
-
-        for (auto const& shape_other : scene_.shape_container) {
-            if (shape != shape_other) {
-                auto shadow_hit = shape_other->intersect(shadow_ray);
-                if (shadow_hit.intersection) {
-                    in_shadow = true;
-                    break;
-                }
-            }
-        }
-
-        if (!in_shadow) {
-            // Diffuse Beleuchtung
-            float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
-            Color diffuse_component_tmp = {
-                light->color.r * light->brightness * shape->get_Material()->kd.r * diffuse_factor,
-                light->color.g * light->brightness * shape->get_Material()->kd.g * diffuse_factor,
-                light->color.b * light->brightness * shape->get_Material()->kd.b * diffuse_factor
-            };
-            diffuse_component = diffuse_component + diffuse_component_tmp;
-
-            // Spekulare Beleuchtung
-            glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
-            glm::vec3 v = glm::normalize(scene_.camera_container[0]->origin - intersection_point);
-
-            float specular_factor = std::pow(std::max(glm::dot(r, v), 0.0f), shape->get_Material()->m);
-            Color specular_component_tmp = {
-                light->color.r * light->brightness * specular_factor,
-                light->color.g * light->brightness * specular_factor,
-                light->color.b * light->brightness * specular_factor
-            };
-
-            specular_component = specular_component + specular_component_tmp;
-        }
-    }
-
-    return ambient_component + diffuse_component + specular_component;
-}*/
 
 Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float const& distance) {
+    glm::mat4 test_mat;
     HitPoint hit = shape->intersect(ray);
+    
+    
+    glm::mat4 mattti = glm::transpose(shape->get_world_transformation_inv()) ;
+    glm::vec4 result = shape->get_world_transformation() * glm::vec4{ hit.intersection_point, 1.0f }; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
+    hit.intersection_point = glm::vec3{result}; //hit intersetion point wird auf den zurücktransformierten gesetzt 
+    hit = transform(mattti,hit); //normale wid zurückberechnet 
+    
+    
+    
 //    glm::vec3 intersection_point = ray.origin + ray.direction * distance;
-    glm::vec3 normal = shape->normal(hit.intersection_point);
+    
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
     Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
@@ -140,7 +57,7 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float
 
     for (auto const& light : scene_.light_container) {
         glm::vec3 light_dir = glm::normalize(light->position - hit.intersection_point);
-        glm::vec3 test2 = hit.intersection_point + 0.1f * normal;
+        glm::vec3 test2 = hit.intersection_point + 0.1f * hit.normale;
 
         Ray shadow_ray = {test2, light_dir};
         bool in_shadow = false;
@@ -157,7 +74,7 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float
 
         if (!in_shadow) {
             // Diffuse Beleuchtung
-            float diffuse_factor = std::max(glm::dot(normal, light_dir), 0.0f);
+            float diffuse_factor = std::max(glm::dot(hit.normale, light_dir), 0.0f);
             Color diffuse_component_tmp = {
                     light->color.r * light->brightness * shape->get_Material()->kd.r * diffuse_factor,
                     light->color.g * light->brightness * shape->get_Material()->kd.g * diffuse_factor,
@@ -165,7 +82,7 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float
             diffuse_component = diffuse_component + diffuse_component_tmp;
 
             // Spekulare Beleuchtung
-            glm::vec3 r = glm::normalize(2.0f * glm::dot(normal, light_dir) * normal - light_dir);
+            glm::vec3 r = glm::normalize(2.0f * glm::dot(hit.normale, light_dir) * hit.normale - light_dir);
             glm::vec3 v = glm::normalize(scene_.camera_container[0]->origin - hit.intersection_point);
 
             float specular_factor = std::pow(std::max(glm::dot(r, v), 0.0f), shape->get_Material()->m);
@@ -183,32 +100,18 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& shape, float
 Color Renderer::trace(Ray const& ray) {
     float closest_distance = std::numeric_limits<float>::max();
     std::shared_ptr<Shape> closest_shape = nullptr;
-    glm::vec3 normal;
-
+    Ray raysin = ray;
     for (auto const& shape : scene_.shape_container) {
-        glm::mat4 test_mat;
-        HitPoint hit = shape->intersect(ray);
-        Ray transformed_ray;
-        if (shape->get_world_transformation() != test_mat) {
-            transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray);
-            hit = shape->intersect(transformed_ray);
-            glm::vec4 result = glm::vec4{hit.intersection_point, 0.0f} * shape->get_world_transformation(); //0.0f oder 1.0f im vec 4 ?? 
-            hit.intersection_point = glm::vec3{result};
+       
+       
+             raysin = transform_ray(shape->get_world_transformation_inv(), ray); //ray wird transformiert 
+             HitPoint hit = shape->intersect(raysin); //hit mit transformed ray
+           // glm::vec4 result = shape->get_world_transformation() * glm::vec4{hit.intersection_point, 1.0f} ; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
+           // hit.intersection_point = glm::vec3{result}; //hit intersetion point wird auf den zurücktransformierten gesetzt 
+            
 
-
-            /*
-            //für die normale /experimentel
-            glm::mat4 world_transform_inv_transpose = glm::transpose(shape->get_world_transformation_inv());
-            glm::vec3 normalo= shape->normal(hit.intersection_point);
-            glm::vec4 temp_final_normal = glm::vec4{ normalo,1.0f } * world_transform_inv_transpose;
-            glm::vec3 normal = glm::vec3{ temp_final_normal };
-            */
-            
-            
-            
-            std::cout << hit.intersection << std::endl;
-//            std::cout << "test"<< std::endl;
-        }
+           
+        
         
 
         if (hit.intersection) {
@@ -222,7 +125,7 @@ Color Renderer::trace(Ray const& ray) {
 
     if (closest_shape) {
         
-        return shade(ray, closest_shape, closest_distance);
+        return shade(raysin, closest_shape, closest_distance);
     } else {
         return background_color;
     }

@@ -40,6 +40,7 @@ HitPoint Sphere::intersect(Ray const& ray) const {
         h.intersection_point = ray.origin + distance * ray.direction;
         h.direction = normalized_direction;
     }
+    h.normale =glm::normalize (normal(h.intersection_point));
     return h;
 }
 
@@ -51,6 +52,6 @@ glm::vec3 Sphere::get_center() const {
 return center_;
 }
 
-glm::vec3 Sphere::normal(glm::vec3 const& point) {
+glm::vec3 Sphere::normal(glm::vec3 const& point) const {
     return glm::normalize(point - center_);
 }
