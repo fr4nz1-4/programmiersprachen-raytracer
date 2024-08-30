@@ -15,15 +15,16 @@ public:
     virtual float volume() const = 0;
     virtual std::ostream& print(std::ostream& os) const;
     virtual HitPoint intersect(Ray const& ray) const = 0;
-    virtual glm::vec3 normal(glm::vec3 const& point) = 0;
+    virtual glm::vec3 normal(glm::vec3 const& point) const = 0;
     virtual ~Shape();
     std::shared_ptr<Material> get_Material() const;
     std::string get_name() const;
-    void set_world_transformation_(glm::mat4 matrix);
-    void set_world_transformation_inv(glm::mat4 matti);
-    glm::mat4 get_world_transformation();
-    glm::mat4 get_world_transformation_inv();
+    void set_world_transformation(glm::mat4 const& matrix) ;
+    glm::mat4 get_world_transformation() const;
+    glm::mat4 get_world_transformation_inv() const ;
 //    friend class Scene;
+private:
+    void compute_inv_world_transform_();
 
 protected:
     std::string name_;
@@ -31,6 +32,8 @@ protected:
     glm::mat4 world_transformation_;
     glm::mat4 world_transformation_inv;
 };
+
+
 
 std::ostream& operator<<(std::ostream& os, Shape const& shape);
 

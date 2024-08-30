@@ -20,27 +20,28 @@ std::ostream& operator<<(std::ostream& os, Shape const& shape) {
 }
 
 std::shared_ptr<Material> Shape::get_Material() const {
-    return this->material_;
+    return material_;
 }
 
 std::string Shape::get_name() const {
-    return this->name_;
+    return name_;
 }
 
-glm::mat4 Shape::get_world_transformation() {
-    return this->world_transformation_;
+glm::mat4 Shape::get_world_transformation() const {
+    return world_transformation_;
 }
 
-glm::mat4 Shape::get_world_transformation_inv() {
-    return this->world_transformation_inv;
+glm::mat4 Shape::get_world_transformation_inv() const {
+    return world_transformation_inv;
 }
 
- void Shape::set_world_transformation_(glm::mat4 matrix) {
-    world_transformation_ = matrix;
+ void Shape::set_world_transformation(glm::mat4 const& matrix)  {
+    world_transformation_ = matrix * world_transformation_;
+    compute_inv_world_transform_();
    
 }
 
-void Shape::set_world_transformation_inv(glm::mat4 matti) {
-    world_transformation_inv = matti;
+void Shape::compute_inv_world_transform_() {
+    world_transformation_inv = glm::inverse(world_transformation_);
     
 }

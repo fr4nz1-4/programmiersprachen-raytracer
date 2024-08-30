@@ -17,7 +17,7 @@ public:
     HitPoint intersect (Ray const& ray) const override;
     ~Sphere();
     glm::vec3 get_center() const;
-    glm::vec3 normal(glm::vec3 const& point) override;
+    glm::vec3 normal(glm::vec3 const& point) const override;
 
 private:
     glm::vec3 center_;

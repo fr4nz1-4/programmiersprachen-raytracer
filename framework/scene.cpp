@@ -29,7 +29,7 @@ std::shared_ptr<Shape> find_shape(Scene const& scene, std::string const& shape_n
 
 void make_world_transform(std::shared_ptr<Shape> shape, glm::vec3 const& scale, glm::vec3 const& translate, float const& rot_degree, glm::vec3 const& rotate) {
     float rad = rot_degree * PI / 180.0f;
-    
+
     /*
     float rad = 45 * PI / 180.0f;
 
@@ -50,18 +50,18 @@ void make_world_transform(std::shared_ptr<Shape> shape, glm::vec3 const& scale, 
     glm::mat4 world_transform = translate_m * rotation_m * scale_m;
     glm::mat4 trans_inv = glm::inverse(world_transform);
     */
-    glm::mat4 translate_m = {1, 0, 0, translate.x,
+    glm::mat4 translate_m = { 1, 0, 0, translate.x,
                              0, 1, 0, translate.y,
                              0, 0, 1, translate.z,
-                             0, 0, 0, 1};
-    glm::mat4 scale_m = {scale.x, 0, 0, 0,
+                             0, 0, 0, 1 };
+    glm::mat4 scale_m = { scale.x, 0, 0, 0,
                          0, scale.y, 0, 0,
                          0, 0, scale.z, 0,
-                         0, 0, 0, 1};
-    glm::mat4 rotation_m = {1, 0, 0, 0,
+                         0, 0, 0, 1 };
+    glm::mat4 rotation_m = { 1, 0, 0, 0,
                             0, std::cos(rad), -std::sin(rad), 0,
                             0, std::sin(rad), std::cos(rad), 0,
-                            0, 0, 0, 1};
+                            0, 0, 0, 1 };
     /*
     glm::mat4 minus_translate_m = { 1, 0, 0, -translate.x,
                              0, 1, 0, -translate.y,
@@ -81,9 +81,7 @@ void make_world_transform(std::shared_ptr<Shape> shape, glm::vec3 const& scale, 
     */
 
     glm::mat4 world_transform = translate_m * rotation_m * scale_m;
-    glm::mat4 trans_inv = glm::inverse(world_transform);
-    shape->set_world_transformation_(world_transform);
-    shape->set_world_transformation_inv(trans_inv); // evtl. fehlerhaft
+    shape->set_world_transformation(world_transform);
 }
 
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
