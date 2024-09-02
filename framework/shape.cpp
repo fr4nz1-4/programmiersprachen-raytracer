@@ -36,7 +36,7 @@ glm::mat4 Shape::get_world_transformation_inv() const {
 }
 
  void Shape::set_world_transformation(glm::mat4 const& matrix)  {
-    world_transformation_ = matrix * world_transformation_;
+     world_transformation_ = matrix; //* world_transformation_;
     compute_inv_world_transform_();
    
 }

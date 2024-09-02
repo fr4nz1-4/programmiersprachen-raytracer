@@ -1,6 +1,7 @@
 #include "sphere.hpp"
 #include "tuple"
 #include <cmath>
+#include <glm/vec3.hpp>
 #include <glm/gtx/intersect.hpp>
 
 Sphere::Sphere(const glm::vec3 &center, float radius):
@@ -40,10 +41,35 @@ HitPoint Sphere::intersect(Ray const& ray) const {
         h.material = material_;
         h.intersection_point = ray.origin + distance * ray.direction;
         h.direction = normalized_direction;
+        h.normale = glm::normalize(normal(h.intersection_point));
     }
-    h.normale = glm::normalize (normal(h.intersection_point));
+    
     return h;
 }
+/*
+HitPoint Sphere::intersect(Ray const& r_original) const{
+    Ray r = r_original;
+
+    float distance = 0.0f;
+    std::shared_ptr<Material> material = this->get_Material();
+
+    r.direction = glm::normalize(r.direction);
+
+    bool cut = glm::intersectRaySphere(r.origin, r.direction, center_, radius_ * radius_, distance);
+
+    glm::vec3 normale_zum_kons = glm::normalize(glm::vec3{ r.origin + distance * r.direction });
+
+    HitPoint hitpoint{ cut, distance,Shape::get_name(), material, r.origin + distance * r.direction, r.direction,  normale_zum_kons };
+
+    
+
+
+    glm::vec3 dis = hitpoint.intersection_point - r_original.origin;
+    float dist = glm::distance(hitpoint.intersection_point, r_original.origin);
+    HitPoint hp{ hitpoint.intersection, dist, hitpoint.name, hitpoint.material, hitpoint.intersection_point, hitpoint.direction, hitpoint.normale };
+
+    return hp;
+}*/
 
 Sphere::~Sphere() {
 //    std::cout<< "Sphere destructor\n";

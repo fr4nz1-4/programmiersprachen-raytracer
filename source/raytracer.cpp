@@ -18,7 +18,7 @@ int main(int argc, char** argv)
   unsigned const image_height = 600;
 //  std::string const filename = "C:/Users/PC/Desktop/uni/SE/programmiersprachen-raytracer/source/scene_2.sdf";
   //std::string const filename = "C:/Users/PC/Desktop/testi/programmiersprachen-raytracer/source/scene_2.sdf";
-  std::string filename = "/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/source/scene_2.sdf"; // "../../../source/scene_2.sdf";
+  std::string filename = "C:/Users/PC/Desktop/testi/programmiersprachen-raytracer/source/scene_2.sdf"; // "../../../source/scene_2.sdf";
 //  std::string const filename = "/Users/franziskapobering/repositories/Programmiersprachen/programmiersprachen-raytracer/source/test_scene.sdf"; // für test_scene (nur kreis)
 //  std::string const filename = "scene_2.sdf";
 

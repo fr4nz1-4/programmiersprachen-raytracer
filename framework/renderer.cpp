@@ -11,7 +11,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include <vector>
-
+#include <glm/gtx/string_cast.hpp>
 
 #define PI 3.14159265358979323846f
 
@@ -23,7 +23,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
         , scene_(scene) {}
 
 Color background_color = {0.0f, 0.3f, 0.3f};
-//Color background_color = {0.0f, 0.0f, 0.0f};
+
 
 Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
 
@@ -35,18 +35,20 @@ Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
 
 
 Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float const& distance) {
-    glm::mat4 test_mat;
+    //glm::mat4 test_mat;
     //HitPoint hit = shape->intersect(ray);
     HitPoint untransformed_hitpoint = closest_object_hitpoint;
-    glm::mat4 world_mat = glm::transpose(shape->get_world_transformation_inv());
+    glm::mat4 world_mat = shape->get_world_transformation();
+    glm::mat4 world_mat_inv = shape->get_world_transformation_inv(); //trnaspose ??
     glm::mat4 transposed_inverse_world_mat = glm::transpose(shape->get_world_transformation_inv()) ;
     //glm::vec4 hitpoint_in_world = shape->get_world_transformation() * glm::vec4{ hit.intersection_point, 1.0f }; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
     //hit.intersection_point = glm::vec3{ hitpoint_in_world }; //hit intersetion point wird auf den zurücktransformierten gesetzt 
     HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurückberechnet 
     
+   // std::cout << "unTransformed Normal: " << glm::to_string(Box->min_) << std::endl;
+    //std::cout << "Transformed Normal: " << glm::to_string(transformed_hit_point.normale) << std::endl;
     
-    
-//    glm::vec3 intersection_point = ray.origin + ray.direction * distance;
+//   
     
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
@@ -63,7 +65,7 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
 
         Ray shadow_ray = {test2, light_dir};
         bool in_shadow = false;
-
+        
         for (auto const& shape_other : scene_.shape_container) {
             if (shape != shape_other) {
                 auto shadow_hit = shape_other->intersect(shadow_ray);
@@ -73,6 +75,17 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
                 }
             }
         }
+        /*
+        for (auto const& shape_other : scene_.shape_container) {
+            if (shape != shape_other) {
+                Ray transformed_shadow_ray = transform_ray(shape_other->get_world_transformation_inv(), shadow_ray);
+                auto shadow_hit = shape_other->intersect(transformed_shadow_ray);
+                if (shadow_hit.intersection) {
+                    in_shadow = true;
+                    break;
+                }
+            }
+        }*/
 
         if (!in_shadow) {
             // Diffuse Beleuchtung
@@ -114,6 +127,7 @@ Color Renderer::trace(Ray const& ray) {
 
     HitPoint closes_object_hitpoint;
     for (auto const& shape : scene_.shape_container) {
+        
        
        
         transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray); //ray wird transformiert 
