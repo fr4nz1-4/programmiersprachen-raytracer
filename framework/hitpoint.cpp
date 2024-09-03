@@ -9,6 +9,5 @@ HitPoint transform(glm::mat4 const& world_mat, glm::mat4 const& tranposed_invert
 	direction = world_mat * direction;
 	normale =glm::normalize(tranposed_inverted_world_mat * normale);
 
-	return HitPoint{ hp.intersection, hp.distance, hp.name, hp.material, glm::vec3{point.x, point.y, point.z}, glm::normalize(glm::vec3{direction.x, direction.y, direction.z}), glm::normalize(glm::vec3{normale.x, normale.y, normale.z}) };
-
+	return HitPoint{hp.intersection, hp.distance, hp.name, hp.material, glm::vec3{point.x, point.y, point.z}, glm::normalize(glm::vec3{direction.x, direction.y, direction.z}), glm::normalize(glm::vec3{normale.x, normale.y, normale.z})};
 }

@@ -42,14 +42,14 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
     glm::mat4 world_mat_inv = shape->get_world_transformation_inv(); //trnaspose ??
     glm::mat4 transposed_inverse_world_mat = glm::transpose(shape->get_world_transformation_inv()) ;
     //glm::vec4 hitpoint_in_world = shape->get_world_transformation() * glm::vec4{ hit.intersection_point, 1.0f }; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
-    //hit.intersection_point = glm::vec3{ hitpoint_in_world }; //hit intersetion point wird auf den zurücktransformierten gesetzt 
-    HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurückberechnet 
-    
-   // std::cout << "unTransformed Normal: " << glm::to_string(Box->min_) << std::endl;
+    //hit.intersection_point = glm::vec3{ hitpoint_in_world }; //hit intersetion point wird auf den zurücktransformierten gesetzt
+    HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurückberechnet
+
+    // std::cout << "unTransformed Normal: " << glm::to_string(Box->min_) << std::endl;
     //std::cout << "Transformed Normal: " << glm::to_string(transformed_hit_point.normale) << std::endl;
-    
-//   
-    
+
+//
+
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
     Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
@@ -65,7 +65,8 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
 
         Ray shadow_ray = {test2, light_dir};
         bool in_shadow = false;
-        
+
+        /*
         for (auto const& shape_other : scene_.shape_container) {
             if (shape != shape_other) {
                 auto shadow_hit = shape_other->intersect(shadow_ray);
@@ -74,8 +75,7 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
                     break;
                 }
             }
-        }
-        /*
+        }*/
         for (auto const& shape_other : scene_.shape_container) {
             if (shape != shape_other) {
                 Ray transformed_shadow_ray = transform_ray(shape_other->get_world_transformation_inv(), shadow_ray);
@@ -85,7 +85,7 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
                     break;
                 }
             }
-        }*/
+        }
 
         if (!in_shadow) {
             // Diffuse Beleuchtung
@@ -112,11 +112,11 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
 
 #if 1
     return {ambient_component + diffuse_component + specular_component};
-#else 
+#else
     glm::vec3 normal_color = untransformed_hitpoint.normale * glm::vec3(0.5f) + glm::vec3(0.5f);
     //std::cout << glm::to_string(normal_color) << std::endl;
     return { normal_color.x, normal_color.y, normal_color.z };
-#endif 
+#endif
 
 }
 
@@ -124,34 +124,26 @@ Color Renderer::trace(Ray const& ray) {
     float closest_distance = std::numeric_limits<float>::max();
     std::shared_ptr<Shape> closest_shape = nullptr;
     Ray transformed_ray = ray;
+    HitPoint hit;
+    HitPoint closest_object_hitpoint;
 
-    HitPoint closes_object_hitpoint;
     for (auto const& shape : scene_.shape_container) {
-        
-       
-       
-        transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray); //ray wird transformiert 
-        
-        //transformed_ray = transform_ray( glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 0.0f)), ray);
-        
-        HitPoint hit = shape->intersect(transformed_ray); //hit mit transformed ray
-           // glm::vec4 result = shape->get_world_transformation() * glm::vec4{hit.intersection_point, 1.0f} ; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
-           // hit.intersection_point = glm::vec3{result}; //hit intersetion point wird auf den zurücktransformierten gesetzt 
-            
+        transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray); //ray wird transformiert
+
+        hit = shape->intersect(transformed_ray); //hit mit transformed ray
 
         if (hit.intersection) {
             float distance = glm::length(hit.intersection_point - scene_.camera_container[0]->origin);
             if (distance < closest_distance) {
                 closest_distance = distance;
                 closest_shape = shape;
-                closes_object_hitpoint = hit;
+                closest_object_hitpoint = hit;
             }
         }
     }
 
     if (closest_shape) {
-        
-        return shade(closes_object_hitpoint, closest_shape, closest_distance);
+        return shade(closest_object_hitpoint, closest_shape, closest_distance);
     } else {
         return background_color;
     }
@@ -163,6 +155,7 @@ void Renderer::render() {
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p = {x, y};
+            Color final_color = {0.0f, 0.0f, 0.0f};  // Farbakkumulator
 
             float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2.0f) / 180.0f * PI);
 
@@ -173,26 +166,33 @@ void Renderer::render() {
             camera_mat[2] = glm::vec4{-(camera.direction), 0.0f};
             camera_mat[3] = glm::vec4{camera.origin, 1.0f};
 
-            // Berechnung der Strahlenrichtung
-            glm::vec4 ray_direction{glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)),
-                                                             (-(height_ / 2.0f) + float(p.y * 1.0f)),
-                                                             - d}), 0.0f};
+//            // Berechnung der Strahlenrichtung
+//            glm::vec4 ray_direction{glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(p.x * 1.0f)),
+//                                                             (-(height_ / 2.0f) + float(p.y * 1.0f)),
+//                                                             -d}), 0.0f};
 
-            ray_direction = glm::normalize(camera_mat * ray_direction);
+            // Anti-Aliasing: 1 Pixel in 2x2 Unterpixel unterteilen
+            for (float fy = 0.0f; fy < 1.0f; fy += 1.0f / 2.0f) {  // Y-Schleife für Unterpixel
+                for (float fx = 0.0f; fx < 1.0f; fx += 1.0f / 2.0f) {  // X-Schleife für Unterpixel
+                    // Berechnung der Strahlenrichtung mit Verschiebung für Unterpixel
+                    glm::vec4 ray_direction = glm::vec4{glm::normalize(glm::vec3{
+                            (-(width_ / 2.0f) + float(p.x + fx)),
+                            (-(height_ / 2.0f) + float(p.y + fy)),
+                            -d}), 0.0f};
 
-            p.color = background_color; // Initialisiere mit Hintergrundfarbe
+                    ray_direction = glm::normalize(camera_mat * ray_direction);
 
-            Ray ray = {camera.origin, glm::vec3{ray_direction}}; // Multiplikation mit Inverser Worldmatrix
+                    Ray ray = {camera.origin, glm::vec3{ray_direction}};  // Strahl erzeugen
+                    Color clr = trace(ray);  // Farbe für diesen Unterpixel berechnen
 
-            Color clr = trace(ray);
+                    final_color = final_color + clr;  // Farbe aufsummieren
+                }
+            }
 
-            // Hintergrundfarbe wird nicht verändert (oder in shade() anpassen)
+            // Mittelwert der Farben der Unterpixel berechnen
+            Color cldr = {final_color.r / 4, final_color.g / 4, final_color.b / 4};
 
-            p.color = Color{clr.r / (clr.r + 1), clr.g / (clr.g + 1), clr.b / (clr.b + 1)};
-
-
-            // Hintergrundfarbe wird auch verändert -> weiß wird zu grau
-            // p.color = Color{clr.r / (clr.r+1), clr.g / (clr.g+1), clr.b / (clr.b+1)};
+            p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};
 
             write(p);  // Schreibe die Farbe des Pixels in das Bild
         }
