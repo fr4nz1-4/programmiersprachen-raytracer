@@ -116,6 +116,8 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
 
                 // Spekularreflexionsexponent
                 line_as_stream >> parsed_material->m;
+                // Reflexionsstärke
+                line_as_stream >> parsed_material->reflectivity;
 
                 // push material into scene
                 scene.material_container.push_back(parsed_material);

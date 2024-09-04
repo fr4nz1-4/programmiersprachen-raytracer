@@ -27,8 +27,8 @@ class Renderer
 public:
   Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene);
   void render();
-  Color trace(Ray const& ray);
-  Color shade(HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float const& distance);
+  Color trace(Ray const& ray, float depth);
+  Color shade(HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float distance);
   void write(Pixel const& p);
   Ray transform_ray(glm::mat4 const& mat, Ray const& ray);
 

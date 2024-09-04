@@ -23,7 +23,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
         , scene_(scene) {}
 
 Color background_color = {0.0f, 0.3f, 0.3f};
-
+const int max_depth = 3; // Maximale Rekursionstiefe für Reflexionen
 
 Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
 
@@ -34,7 +34,7 @@ Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
 }
 
 
-Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float const& distance) {
+Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float distance) {
     //glm::mat4 test_mat;
     //HitPoint hit = shape->intersect(ray);
     HitPoint untransformed_hitpoint = closest_object_hitpoint;
@@ -47,9 +47,6 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
 
     // std::cout << "unTransformed Normal: " << glm::to_string(Box->min_) << std::endl;
     //std::cout << "Transformed Normal: " << glm::to_string(transformed_hit_point.normale) << std::endl;
-
-//
-
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
     Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
@@ -120,7 +117,12 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
 
 }
 
-Color Renderer::trace(Ray const& ray) {
+Color Renderer::trace(Ray const& ray, float depth) {
+    // Maximaler Rekursionstiefe für Reflexionen
+    if (depth > max_depth) {
+        return background_color;
+    }
+
     float closest_distance = std::numeric_limits<float>::max();
     std::shared_ptr<Shape> closest_shape = nullptr;
     Ray transformed_ray = ray;
@@ -143,7 +145,30 @@ Color Renderer::trace(Ray const& ray) {
     }
 
     if (closest_shape) {
-        return shade(closest_object_hitpoint, closest_shape, closest_distance);
+        Color local_color = shade(closest_object_hitpoint, closest_shape, closest_distance);
+
+        // Reflexion
+        if (closest_shape->get_Material()->reflectivity > 0.0f) {
+            // Berechnung des reflektierten Rays
+            glm::vec3 reflected_direction = glm::reflect(ray.direction, closest_object_hitpoint.normale);
+            glm::vec3 reflected_location = closest_object_hitpoint.intersection_point;
+            reflected_location = reflected_location + 0.001f * reflected_direction;
+
+            Ray reflected_ray = {reflected_location, reflected_direction};
+
+            Color reflected_color = trace(reflected_ray, depth + 1);
+
+            //lokale Farbe wird mit reflektierter Farbe kombiniert
+            local_color = {local_color.r * (1.0f - closest_shape->get_Material()->reflectivity) +
+                           reflected_color.r * closest_shape->get_Material()->reflectivity,
+                           local_color.g * (1.0f - closest_shape->get_Material()->reflectivity) +
+                           reflected_color.g * closest_shape->get_Material()->reflectivity,
+                           local_color.b * (1.0f - closest_shape->get_Material()->reflectivity) +
+                           reflected_color.b * closest_shape->get_Material()->reflectivity};
+        }
+
+        return local_color;
+        // return shade(closest_object_hitpoint, closest_shape, closest_distance);
     } else {
         return background_color;
     }
@@ -155,7 +180,7 @@ void Renderer::render() {
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p = {x, y};
-            Color final_color = {0.0f, 0.0f, 0.0f};  // Farbakkumulator
+            Color final_color = {0.0f, 0.0f, 0.0f};
 
             float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2.0f) / 180.0f * PI);
 
@@ -172,9 +197,9 @@ void Renderer::render() {
 //                                                             -d}), 0.0f};
 
             // Anti-Aliasing: 1 Pixel in 2x2 Unterpixel unterteilen
-            for (float fy = 0.0f; fy < 1.0f; fy += 1.0f / 2.0f) {  // Y-Schleife für Unterpixel
-                for (float fx = 0.0f; fx < 1.0f; fx += 1.0f / 2.0f) {  // X-Schleife für Unterpixel
-                    // Berechnung der Strahlenrichtung mit Verschiebung für Unterpixel
+            for (float fy = 0.0f; fy < 1.0f; fy += 1.0f / 2.0f) {
+                for (float fx = 0.0f; fx < 1.0f; fx += 1.0f / 2.0f) {
+                    // Berechnung der strahlenrichtung mit verschiebung für Unterpixel
                     glm::vec4 ray_direction = glm::vec4{glm::normalize(glm::vec3{
                             (-(width_ / 2.0f) + float(p.x + fx)),
                             (-(height_ / 2.0f) + float(p.y + fy)),
@@ -183,7 +208,7 @@ void Renderer::render() {
                     ray_direction = glm::normalize(camera_mat * ray_direction);
 
                     Ray ray = {camera.origin, glm::vec3{ray_direction}};  // Strahl erzeugen
-                    Color clr = trace(ray);  // Farbe für diesen Unterpixel berechnen
+                    Color clr = trace(ray, 0);  // farbe für diesen unterpixel berechnen
 
                     final_color = final_color + clr;  // Farbe aufsummieren
                 }
@@ -197,7 +222,7 @@ void Renderer::render() {
             write(p);  // Schreibe die Farbe des Pixels in das Bild
         }
     }
-//    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
+    ppm_.save(filename_); // Bild speichern in filename_
 }
 
 /* // alte render()-Methode
@@ -300,7 +325,7 @@ void Renderer::render() {
             write(p);  // Schreibe die Farbe des Pixels in das Bild  // Schreibe die Farbe des Pixels in das Bild
         }
     }
-//    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
+    ppm_.save(filename_); // Speichere das Bild nach dem Rendern aller Pixel
 }
 */
 
