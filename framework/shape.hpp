@@ -7,12 +7,14 @@
 #include "ray.hpp"
 #include "material.hpp"
 #include "glm/matrix.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 class Shape {
 public:
     Shape(std::string const& name, std::shared_ptr<Material> const& material);
-    virtual float area() const = 0;
-    virtual float volume() const = 0;
+//    virtual float area() const = 0;
+//    virtual float volume() const = 0;
     virtual std::ostream& print(std::ostream& os) const;
     virtual HitPoint intersect(Ray const& ray) const = 0;
     virtual glm::vec3 normal(glm::vec3 const& point) const = 0;
@@ -21,7 +23,8 @@ public:
     std::string get_name() const;
     void set_world_transformation(glm::mat4 const& matrix) ;
     glm::mat4 get_world_transformation() const;
-    glm::mat4 get_world_transformation_inv() const ;
+    glm::mat4 get_world_transformation_inv() const;
+    void make_world_transform(glm::vec3 const& scale, glm::vec3 const& translate, float rot_degree, glm::vec3 const& rotate);
 //    friend class Scene;
 private:
     void compute_inv_world_transform_();

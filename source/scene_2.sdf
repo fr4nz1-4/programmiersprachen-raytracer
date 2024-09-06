@@ -1,23 +1,38 @@
 # materials
-define material red 1 0 0 1 0 0 1 0 0 20 0.5
-define material green 0 1 0 0 1 0 0 1 0 1000 0.5
-define material blue 0 0 1 0 0 1 0 0 1 10 0.0
-define material gray 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 10 0.9
-define material white 1 1 1 1 1 1 1 1 1 10000 0.5
-define material black 0 0 0 0 0 0 0 0 0 10000 0.5
+define material red 1 0 0 1 0 0 1 0 0 20 0.6
+define material green 0 1 0 0 1 0 0 1 0 1000 0.6
+define material blue 0 0 1 0 0 1 0 0 1 10 0.6
+define material grey 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 10
 # shapes
-define shape box box1 white -25 -2 -25 25 2 25
-#define shape box box2 gray -25 -2 -25 25 2 25
-#define shape sphere sphere2 red 0 0 0 25
-#define shape box box1 red -50 -50 -50 50 50 -100
-define shape sphere sphere1 blue 0 0 0 10
+define shape box box0 grey -25 -2 -25 25 2 25
+#define shape box box-1 red -25 -2 -25 25 2 25
+#define shape box box-2 green -25 -2 -25 25 2 25
+#define shape box box-3 blue -25 -2 -25 25 2 25
+define shape box box1 red -25 -2 -25 25 2 25
+define shape box box2 green -25 -2 -25 25 2 25
+define shape box box3 blue -25 -2 -25 25 2 25
+define shape box box4 green -25 -2 -25 25 2 25
+define shape box box5 blue -25 -2 -25 25 2 25
+define shape box box6 red -25 -2 -25 25 2 25
+define shape box box7 blue -25 -2 -25 25 2 25
+define shape box box8 red -25 -2 -25 25 2 25
+define shape box box9 green -25 -2 -25 25 2 25
+#define shape box box10 blue -25 -6 -25 25 6 25
+define shape sphere sphere1 grey 0 0 0 20
 # light postion color brightness
 define light light1 0.0 200.0 -250.0 1.0 1.0 1.0 1.0
-define light light2 0.0 0.0 50.0 1.0 1.0 1.0 1.0
+define light light2 -30.0 0.0 50.0 1.0 1.0 1.0 1.0
 # camera
-define camera camera1 90.0 0.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0
+define camera camera1 45.0 0.0 0.0 0.0 0.0 0.0 -1.0 0.0 1.0 0.0
 #transformations
-transform sphere1 rotate 0 1 0 0 translate 0 10 -20 scale 1 1 1
-#transform sphere2 rotate 0 1 0 0 translate 50 0 -130 scale 1 1 1
-transform box1 rotate 0 0 1 0 translate 0 -40 -75 scale 4 1 8
-#transform box2 rotate -45 1 0 0 translate 0 40 -150 scale 1 1 1
+transform box0 rotate 0 1 0 0 translate -100 -50 -150 scale 1 1 1
+transform box1 rotate 0 1 0 0 translate -50 -50 -200 scale 1 1 1
+transform box2 rotate 0 1 0 0 translate 0 -50 -200 scale 1 1 1
+transform box3 rotate 0 1 0 0 translate 50 -50 -200 scale 1 1 1
+transform box4 rotate 0 1 0 0 translate -50 -50 -250 scale 1 1 1
+transform box5 rotate 0 1 0 0 translate 0 -50 -250 scale 1 1 1
+transform box6 rotate 0 1 0 0 translate 50 -50 -250 scale 1 1 1
+transform box7 rotate 0 1 0 0 translate -50 -50 -300 scale 1 1 1
+transform box8 rotate 0 1 0 0 translate 0 -50 -300 scale 1 1 1
+transform box9 rotate 0 1 0 0 translate 50 -50 -300 scale 1 1 1
+transform sphere1 rotate 0 1 0 0 translate -25 40 -220 scale 1 1 1
