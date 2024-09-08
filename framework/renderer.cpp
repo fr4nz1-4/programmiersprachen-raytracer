@@ -22,7 +22,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
         , filename_(file), ppm_(width_, height_)
         , scene_(scene) {}
 
-Color background_color = {0.0f, 0.0f, 0.0f};
+const Color background_color = {0.0f, 0.0f, 0.0f};
 const int max_depth = 5; // Maximale Rekursionstiefe für Reflexionen
 
 // transformiert ray vom
@@ -34,7 +34,7 @@ Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
     return Ray{glm::vec3{transformed_origin}, (glm::vec3{transformed_direction})};
 }
 
-Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float distance) {
+Color Renderer::shade(HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float distance, Ray const& ray, int depth) {
     HitPoint untransformed_hitpoint = closest_object_hitpoint;
     glm::mat4 world_mat = shape->get_world_transformation();
     glm::mat4 world_mat_inv = shape->get_world_transformation_inv();
@@ -43,12 +43,13 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
     HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurücktransfomiert
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
+    Color diffuse_component = {0, 0, 0};
+    Color specular_component = {0, 0, 0};
+
+    // ambiente beleuchtung
     Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
                                ambient_factor.g * shape->get_Material()->ka.g,
                                ambient_factor.b * shape->get_Material()->ka.b};
-
-    Color diffuse_component = {0, 0, 0};
-    Color specular_component = {0, 0, 0};
 
     // Schattenberechnung und Beleuchtung für jede Lichtquelle
     for (auto const& light : scene_.light_container) {
@@ -93,8 +94,26 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
         }
     }
 
-    #if 1
-        return {ambient_component + diffuse_component + specular_component};
+    Color local_color = ambient_component + diffuse_component + specular_component;
+
+    // Reflexion
+    float reflectivity = shape->get_Material()->reflectivity;
+    if (reflectivity > 0.0f && depth < max_depth) {
+        // Reflexionsrichtung berechnen
+        glm::vec3 reflection_direction = glm::reflect(ray.direction, transformed_hit_point.normale);
+        Ray reflected_ray{transformed_hit_point.intersection_point + 0.001f * transformed_hit_point.normale, reflection_direction};
+
+        // Verfolge reflektierten Strahl
+        Color reflected_color = trace(reflected_ray, depth + 1);
+
+        // Reflexionsfarbe hinzufügen
+        local_color.r = local_color.r + reflectivity * reflected_color.r;
+        local_color.g = local_color.g + reflectivity * reflected_color.g;
+        local_color.b = local_color.b + reflectivity * reflected_color.b;
+    }
+
+#if 1
+        return local_color;
     #else
         glm::vec3 normal_color = untransformed_hitpoint.normale * glm::vec3(0.5f) + glm::vec3(0.5f);
         //std::cout << glm::to_string(normal_color) << std::endl;
@@ -126,32 +145,8 @@ Color Renderer::trace(Ray const& ray, int depth) {
     if (!closest_hit.intersection) {
         return background_color;
     }
-
-    // Transform hit point und normal zurück ins weltkoordinatensystem
-    glm::vec3 transformed_hit_point = glm::vec3(closest_shape->get_world_transformation() * glm::vec4(closest_hit.intersection_point, 1.0f));
-    glm::vec3 transformed_normal = glm::normalize(glm::vec3(closest_shape->get_world_transformation() * glm::vec4(closest_hit.normale, 0.0f)));
-
-    // objekt mit kürzester distanz einfärben
-    Color local_color = shade(closest_hit, closest_shape, closest_distance);
-
-    // wenn objekt reflektiert
-    float reflectivity = closest_shape->get_Material()->reflectivity;
-    if (reflectivity > 0.0f) {
-        // reflexionsrichtung im weltkoordinatensystem berechnen
-        glm::vec3 reflection_direction = glm::reflect(ray.direction, transformed_normal);
-
-        // abstand ergänzen um objekt nicht selbst zu treffen
-        Ray reflected_ray{transformed_hit_point + 0.001f * transformed_normal, reflection_direction};
-
-        // Trace mit reflektiertem ray
-        Color reflected_color = trace(reflected_ray, depth + 1);
-
-        // farben des objekts mit reflexions-farben kombinieren
-        local_color.r = local_color.r + reflectivity * reflected_color.r;
-        local_color.g = local_color.g + reflectivity * reflected_color.g;
-        local_color.b = local_color.b + reflectivity * reflected_color.b;
-    }
-    return local_color;
+    // Farbe berechnen (Reflexionen werden nun in shade behandelt)
+    return shade(closest_hit, closest_shape, closest_distance, ray, depth);
 }
 
 void Renderer::render() {
