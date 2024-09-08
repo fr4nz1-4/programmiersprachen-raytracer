@@ -31,7 +31,6 @@ std::shared_ptr<Shape> find_shape(Scene const& scene, std::string const& shape_n
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
     std::vector<std::shared_ptr<Shape>> all_shapes;
     std::vector<std::shared_ptr<Shape>> composite_shapes;
-
     // Datei öffnen
     std::ifstream sdf_file(sdf_file_path);
     // falls nicht geöffnet → fehler
@@ -152,7 +151,6 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
 //                    // schleife wird beendet, wenn Ende der sdf-datei erreicht -> um alle shapes hinzuzufügen
 ////                    while () {
 ////                        line_as_stream >> composite_shape_name;
-////
 ////                    }
 //                }
             }
@@ -199,7 +197,7 @@ void parse_sdf_file(const std::string& sdf_file_path, Scene& scene) {
             float rot_degree = 0.0f;
 
             line_as_stream >> shape_name;
-            
+
             std::string inner_token;
             while (line_as_stream >> inner_token) {
                 if ("rotate" == inner_token) {

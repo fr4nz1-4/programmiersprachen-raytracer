@@ -23,7 +23,7 @@
 struct Scene {
     std::vector<std::shared_ptr<Material> > material_container;
     std::vector<std::shared_ptr<Shape> > shape_container;
-    std::vector<std::shared_ptr<Shape> > shape_container;
+    std::shared_ptr<Shape> root;
     std::vector<std::shared_ptr<Light> > light_container;
     std::vector<std::shared_ptr<Camera> > camera_container; // container ist theoretisch nicht nötig
 };
