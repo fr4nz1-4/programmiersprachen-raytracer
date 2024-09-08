@@ -1,4 +1,3 @@
-// erstellt NUR Bilder, schreibt keine sdf dateien
 #include <renderer.hpp>
 #include <window.hpp>
 #include <GLFW/glfw3.h>
@@ -11,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// erstellt NUR Bilder, schreibt keine sdf dateien
 //now single threaded again
 int main(int argc, char **argv) {
     unsigned const image_width = 1500;
@@ -54,18 +54,6 @@ int main(int argc, char **argv) {
 
 /*
 // schreibt sdf dateien UND erstellt Bilder
-#include <renderer.hpp>
-#include <window.hpp>
-#include <GLFW/glfw3.h>
-#include <thread>
-#include "iostream"
-#include <fstream>
-#include <utility>
-#include <cmath>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 int main(int argc, char **argv) {
     unsigned const image_width = 500;
     unsigned const image_height = 400;

@@ -22,9 +22,10 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
         , filename_(file), ppm_(width_, height_)
         , scene_(scene) {}
 
-Color background_color = {0.0f, 0.3f, 0.3f};
+Color background_color = {0.0f, 0.0f, 0.0f};
 const int max_depth = 5; // Maximale Rekursionstiefe für Reflexionen
 
+// transformiert ray vom
 Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
 
     glm::vec4 transformed_origin = mat * glm::vec4{ray.origin, 1.0f};
@@ -33,20 +34,13 @@ Ray Renderer::transform_ray(glm::mat4 const& mat, Ray const& ray) {
     return Ray{glm::vec3{transformed_origin}, (glm::vec3{transformed_direction})};
 }
 
-
 Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<Shape> const& shape, float distance) {
-    //glm::mat4 test_mat;
-    //HitPoint hit = shape->intersect(ray);
     HitPoint untransformed_hitpoint = closest_object_hitpoint;
     glm::mat4 world_mat = shape->get_world_transformation();
-    glm::mat4 world_mat_inv = shape->get_world_transformation_inv(); //trnaspose ??
-    glm::mat4 transposed_inverse_world_mat = glm::transpose(shape->get_world_transformation_inv()) ;
-    //glm::vec4 hitpoint_in_world = shape->get_world_transformation() * glm::vec4{ hit.intersection_point, 1.0f }; //0.0f oder 1.0f im vec 4 ?? zurücktransformierter hitpoint(intersection point)
-    //hit.intersection_point = glm::vec3{ hitpoint_in_world }; //hit intersetion point wird auf den zurücktransformierten gesetzt
-    HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurückberechnet
+    glm::mat4 world_mat_inv = shape->get_world_transformation_inv();
 
-    // std::cout << "unTransformed Normal: " << glm::to_string(Box->min_) << std::endl;
-    //std::cout << "Transformed Normal: " << glm::to_string(transformed_hit_point.normale) << std::endl;
+    glm::mat4 transposed_inverse_world_mat = glm::transpose(shape->get_world_transformation_inv()) ;
+    HitPoint transformed_hit_point = transform(world_mat, transposed_inverse_world_mat, untransformed_hitpoint); //normale wid zurücktransfomiert
 
     Color ambient_factor = {0.5f, 0.5f, 0.5f};
     Color ambient_component = {ambient_factor.r * shape->get_Material()->ka.r,
@@ -56,6 +50,7 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
     Color diffuse_component = {0, 0, 0};
     Color specular_component = {0, 0, 0};
 
+    // Schattenberechnung und Beleuchtung für jede Lichtquelle
     for (auto const& light : scene_.light_container) {
         glm::vec3 light_dir = glm::normalize(light->position - transformed_hit_point.intersection_point);
         glm::vec3 test2 = transformed_hit_point.intersection_point + 0.1f * transformed_hit_point.normale;
@@ -63,16 +58,7 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
         Ray shadow_ray = {test2, light_dir};
         bool in_shadow = false;
 
-        /*
-        for (auto const& shape_other : scene_.shape_container) {
-            if (shape != shape_other) {
-                auto shadow_hit = shape_other->intersect(shadow_ray);
-                if (shadow_hit.intersection) {
-                    in_shadow = true;
-                    break;
-                }
-            }
-        }*/
+        // überprüft ob objekt im schatten liegt
         for (auto const& shape_other : scene_.shape_container) {
             if (shape != shape_other) {
                 Ray transformed_shadow_ray = transform_ray(shape_other->get_world_transformation_inv(), shadow_ray);
@@ -107,71 +93,65 @@ Color Renderer::shade( HitPoint const& closest_object_hitpoint, std::shared_ptr<
         }
     }
 
-#if 1
-    return {ambient_component + diffuse_component + specular_component};
-#else
-    glm::vec3 normal_color = untransformed_hitpoint.normale * glm::vec3(0.5f) + glm::vec3(0.5f);
-    //std::cout << glm::to_string(normal_color) << std::endl;
-    return { normal_color.x, normal_color.y, normal_color.z };
-#endif
-
+    #if 1
+        return {ambient_component + diffuse_component + specular_component};
+    #else
+        glm::vec3 normal_color = untransformed_hitpoint.normale * glm::vec3(0.5f) + glm::vec3(0.5f);
+        //std::cout << glm::to_string(normal_color) << std::endl;
+        return { normal_color.x, normal_color.y, normal_color.z };
+    #endif
 }
 
-Color Renderer::trace(Ray const& ray, float depth) {
-    // Maximaler Rekursionstiefe für Reflexionen
+Color Renderer::trace(Ray const& ray, int depth) {
     if (depth > max_depth) {
         return background_color;
     }
 
+    HitPoint closest_hit;
     float closest_distance = std::numeric_limits<float>::max();
     std::shared_ptr<Shape> closest_shape = nullptr;
-    Ray transformed_ray = ray;
-    HitPoint hit;
-    HitPoint closest_object_hitpoint;
-    closest_object_hitpoint.distance = std::numeric_limits<float>::max();
 
+    // shape (und hitpoint) finden, die am nächsten an kamera dran ist
     for (auto const& shape : scene_.shape_container) {
-        transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray); //ray wird transformiert
-
-        hit = shape->intersect(transformed_ray); //hit mit transformed ray
-
-        if (hit.intersection) {
-            float distance = glm::length(hit.intersection_point - scene_.camera_container[0]->origin);
-            if (hit.distance < closest_object_hitpoint.distance) {
-//                closest_distance = distance;
-                closest_shape = shape;
-                closest_object_hitpoint = hit;
-            }
+        Ray transformed_ray = transform_ray(shape->get_world_transformation_inv(), ray);
+        HitPoint hit = shape->intersect(transformed_ray);
+        if (hit.intersection && hit.distance < closest_distance) {
+            closest_hit = hit;
+            closest_distance = hit.distance;
+            closest_shape = shape;
         }
     }
 
-    if (closest_object_hitpoint.intersection) {
-        Color local_color = shade(closest_object_hitpoint, closest_shape, closest_distance);
-
-        // Reflexion
-        if (closest_shape->get_Material()->reflectivity > 0.0f) {
-            float reflection_factor = closest_shape->get_Material()->reflectivity; // Reflexionskoeffizient
-
-            // Berechnung des reflektierten Rays
-            glm::vec3 reflected_direction = glm::reflect(glm::normalize(ray.direction), glm::normalize(closest_object_hitpoint.normale));
-            glm::vec3 reflected_location = closest_object_hitpoint.intersection_point;
-            reflected_location = reflected_location + 0.01f * reflected_direction;
-
-            Ray reflected_ray = {reflected_location, reflected_direction};
-
-            Color reflected_color = trace(reflected_ray, depth + 1);
-
-            //lokale Farbe wird mit reflektierter Farbe kombiniert
-            local_color.r = std::clamp((1.0f - reflection_factor) * local_color.r + reflection_factor * reflected_color.r, 0.0f, 1.0f);
-            local_color.g = std::clamp((1.0f - reflection_factor) * local_color.g + reflection_factor * reflected_color.g, 0.0f , 1.0f);
-            local_color.b = std::clamp((1.0f - reflection_factor) * local_color.b + reflection_factor * reflected_color.b, 0.0f, 1.0f);
-        }
-
-        return local_color;
-        // return shade(closest_object_hitpoint, closest_shape, closest_distance);
-    } else {
+    // wenn kein objekt getroffen
+    if (!closest_hit.intersection) {
         return background_color;
     }
+
+    // Transform hit point und normal zurück ins weltkoordinatensystem
+    glm::vec3 transformed_hit_point = glm::vec3(closest_shape->get_world_transformation() * glm::vec4(closest_hit.intersection_point, 1.0f));
+    glm::vec3 transformed_normal = glm::normalize(glm::vec3(closest_shape->get_world_transformation() * glm::vec4(closest_hit.normale, 0.0f)));
+
+    // objekt mit kürzester distanz einfärben
+    Color local_color = shade(closest_hit, closest_shape, closest_distance);
+
+    // wenn objekt reflektiert
+    float reflectivity = closest_shape->get_Material()->reflectivity;
+    if (reflectivity > 0.0f) {
+        // reflexionsrichtung im weltkoordinatensystem berechnen
+        glm::vec3 reflection_direction = glm::reflect(ray.direction, transformed_normal);
+
+        // abstand ergänzen um objekt nicht selbst zu treffen
+        Ray reflected_ray{transformed_hit_point + 0.001f * transformed_normal, reflection_direction};
+
+        // Trace mit reflektiertem ray
+        Color reflected_color = trace(reflected_ray, depth + 1);
+
+        // farben des objekts mit reflexions-farben kombinieren
+        local_color.r = local_color.r + reflectivity * reflected_color.r;
+        local_color.g = local_color.g + reflectivity * reflected_color.g;
+        local_color.b = local_color.b + reflectivity * reflected_color.b;
+    }
+    return local_color;
 }
 
 void Renderer::render() {
@@ -182,9 +162,12 @@ void Renderer::render() {
             Pixel p = {x, y};
             Color final_color = {0.0f, 0.0f, 0.0f};
 
+            // abstand der kamera zur bilebene
             float d = (width_ / 2.0f) / std::tan((scene_.camera_container[0]->fov / 2.0f) / 180.0f * PI);
 
             glm::vec3 u = glm::normalize(glm::cross(camera.direction, camera.up));
+
+            // kameramatrix aufstellen für transformation zw. welt- und lokalem koordinatensystem
             glm::mat4 camera_mat;
             camera_mat[0] = glm::vec4{u, 0.0f};
             camera_mat[1] = glm::vec4{glm::cross(u, (camera.direction)), 0.0f};
@@ -209,7 +192,7 @@ void Renderer::render() {
                 }
             }
 
-            // Mittelwert der Farben der Unterpixel berechnen
+            // Mittelwert der farben der unterpixel berechnen
             Color cldr = {final_color.r / 4, final_color.g / 4, final_color.b / 4};
 
             p.color = Color{cldr.r / (cldr.r+1), cldr.g / (cldr.g+1), cldr.b / (cldr.b+1)};

@@ -44,6 +44,7 @@ void Shape::compute_inv_world_transform_() {
     world_transformation_inv = glm::inverse(world_transformation_);
 }
 
+// erstellt die welt-transformations_matrix
 void Shape::make_world_transform(glm::vec3 const& scale, glm::vec3 const& translate, float rot_degree, glm::vec3 const& rotate) {
 //    std::cout << "Parameters for world transformation:" << std::endl;
 //    std::cout << "Scale: (" << scale.x << ", " << scale.y << ", " << scale.z << ")" << std::endl;

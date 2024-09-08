@@ -19,5 +19,4 @@ struct Material {
     }
 };
 
-
 #endif //RAYTRACER_MATERIAL_HPP

@@ -28,7 +28,6 @@ struct Scene {
     std::vector<std::shared_ptr<Camera> > camera_container; // container ist theoretisch nicht nötig
 };
 
-
 void parse_sdf_file(const std::string& sdf_file_path, Scene& scene);
 
 #endif //RAYTRACER_SCENE_HPP

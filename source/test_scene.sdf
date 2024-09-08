@@ -6,11 +6,13 @@ define material gray 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 10
 # shapes
 define shape sphere sphere1 blue 0 0 0 20.0
 define shape box box1 red -25 -10 -25 25 10 25
+define shape box box2 green -25 -25 -25 25 25 25
 # light
 define light light2 0.0 0.0 0.0 1 1 1 1.0
 define light light1 0.0 200.0 -250.0 1.0 1.0 1.0 1.0
 # camera
-define camera camera1 45.0 80 -20 50 -0.4 0 -1 0 1 0
+define camera camera1 45.0 0 0 100 0 0 -1 0 1 0
 # transform
-transform box1 rotate 0 1 0 0 translate 0 -45 -140 scale 2 1 1
-transform sphere1 rotate 0 1 0 0 translate 0 -10 -150 scale 1 1 1
+transform box1 rotate -45 0 2 1 translate 0 -55 -140 scale 1 0.5 0.5
+transform box2 rotate 80 0 0 1 translate 0 50 -140 scale 0.5 0.5 0.5
+transform sphere1 rotate 40 0 0 1 translate 0 0 -150 scale 2 1 1

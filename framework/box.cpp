@@ -25,13 +25,15 @@ Box::Box(std::string const& name, std::shared_ptr<Material> const& material, glm
 //}
 
 std::ostream &Box::print(std::ostream &os) const {
-    return Shape::print(os) << " | Minimum-Punkt: " << min_.x << ", " << min_.y << ", " << min_.z << " | Maximum-Punkt: " << max_.x << ", " << max_.y << ", " << max_.z << "\n";
+    return Shape::print(os) << " | Minimum-Punkt: " << min_.x << ", " << min_.y << ", " << min_.z
+                            << " | Maximum-Punkt: " << max_.x << ", " << max_.y << ", " << max_.z << "\n";
 }
 
 Box::~Box() {
 //    std::cout<< "Box destructor\n";
 }
 
+// schnitttest zwischen ray und box
 HitPoint Box::intersect(const Ray &ray) const {
     float distance = 0.0f;
     HitPoint hitpoint;
@@ -124,7 +126,8 @@ HitPoint Box::intersect(const Ray &ray) const {
     hitpoint.direction = direction;
     hitpoint.normale = glm::normalize(normal(hitpoint.intersection_point));
 
-//    std::cout<< hitpoint.distance << " | " << hitpoint.intersection_point.x << ", " << hitpoint.intersection_point.y << ", " << hitpoint.intersection_point.z << "\n";
+//    std::cout << hitpoint.distance << " | " << hitpoint.intersection_point.x << ", "
+//              << hitpoint.intersection_point.y << ", " << hitpoint.intersection_point.z << "\n";
 
     return hitpoint;
 }
@@ -155,8 +158,6 @@ glm::vec3 Box::normal(glm::vec3 const& point) const  {
         return {0.0f, 0.0f, 1.0f};
     } else {
         // Ausnahmefall: Punkt außerhalb der Boxs
-        
-
         return {0.0f, 0.0f, 0.0f};
     }
 }

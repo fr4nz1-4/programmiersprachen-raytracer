@@ -24,6 +24,4 @@ private:
     float radius_;
 };
 
-// hello world
-
 #endif //RAYTRACER_SPHERE_HPP

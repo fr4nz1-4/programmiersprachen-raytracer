@@ -6,6 +6,7 @@
 #include "shape.hpp"
 #include <vector>
 
+// zwar teilweise implementiert aber nicht verwendet
 class Composite : Shape {
 public:
     Composite(std::string const& name);
